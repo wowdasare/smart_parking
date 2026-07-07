@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Remove Vehicle — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="auth-card">
+                <div class="auth-icon bg-danger-subtle" style="background: rgba(200,67,61,0.12); color: #c8433d;">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <h1 class="h3 mb-3">Remove vehicle</h1>
+                <p class="mb-4">Are you sure you want to remove <strong>{{ vehicle }}</strong> from your profile?</p>
+                <form method="post" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, remove it</button>
+                    <a href="{% url 'vehicles:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

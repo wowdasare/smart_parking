@@ -1,0 +1,294 @@
+/* ============================================================
+   ATU Smart Parking — design system
+   Swap the variables below for ATU's official brand colors if
+   you have a style guide; every component here reads from them.
+   ============================================================ */
+
+:root {
+    --atu-primary: #0b3d63;
+    --atu-primary-dark: #072844;
+    --atu-primary-light: #124a78;
+    --atu-accent: #f2a900;
+    --atu-accent-dark: #cf8f00;
+    --atu-bg: #f4f6f9;
+    --atu-surface: #ffffff;
+    --atu-text: #1c2733;
+    --atu-text-muted: #5a6b7d;
+    --atu-border: #e2e8f0;
+
+    --atu-radius-sm: 0.5rem;
+    --atu-radius: 0.9rem;
+    --atu-radius-lg: 1.25rem;
+    --atu-shadow-sm: 0 1px 3px rgba(11, 61, 99, 0.08);
+    --atu-shadow: 0 0.5rem 1.5rem rgba(11, 61, 99, 0.1);
+    --atu-shadow-lg: 0 1rem 3rem rgba(11, 61, 99, 0.14);
+
+    --bs-primary: var(--atu-primary);
+    --bs-primary-rgb: 11, 61, 99;
+    --bs-link-color: var(--atu-primary);
+    --bs-link-color-rgb: 11, 61, 99;
+    --bs-link-hover-color: var(--atu-primary-dark);
+    --bs-link-hover-color-rgb: 7, 40, 68;
+    --bs-body-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background-color: var(--atu-bg);
+    color: var(--atu-text);
+}
+
+h1, h2, h3, h4, h5, h6,
+.navbar-brand, .fw-semibold {
+    font-family: 'Poppins', 'Inter', sans-serif;
+}
+
+/* ---------- Navbar ---------- */
+
+.navbar.bg-dark {
+    background-color: var(--atu-primary) !important;
+    box-shadow: var(--atu-shadow-sm);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.navbar-brand i {
+    color: var(--atu-accent);
+}
+
+.navbar .nav-link {
+    font-weight: 500;
+}
+
+.navbar .btn-link.nav-link {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.navbar .btn-link.nav-link:hover {
+    color: #fff;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+    border-radius: var(--atu-radius-sm);
+    font-weight: 500;
+    padding-inline: 1.1rem;
+}
+
+.btn-primary {
+    background-color: var(--atu-primary);
+    border-color: var(--atu-primary);
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background-color: var(--atu-primary-dark) !important;
+    border-color: var(--atu-primary-dark) !important;
+}
+
+.btn-accent {
+    background-color: var(--atu-accent);
+    border-color: var(--atu-accent);
+    color: #241a00;
+}
+
+.btn-accent:hover, .btn-accent:focus {
+    background-color: var(--atu-accent-dark);
+    border-color: var(--atu-accent-dark);
+    color: #241a00;
+}
+
+.btn-outline-primary {
+    color: var(--atu-primary);
+    border-color: var(--atu-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--atu-primary);
+    border-color: var(--atu-primary);
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius);
+    box-shadow: var(--atu-shadow-sm);
+}
+
+.card.card-hover {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card.card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--atu-shadow);
+}
+
+/* ---------- Forms ---------- */
+
+.form-control, .form-select {
+    border-radius: var(--atu-radius-sm);
+    padding: 0.55rem 0.85rem;
+    border-color: var(--atu-border);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--atu-primary-light);
+    box-shadow: 0 0 0 0.2rem rgba(11, 61, 99, 0.15);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--atu-text);
+}
+
+/* ---------- Auth card (login/register/password screens) ---------- */
+
+.auth-card {
+    background: var(--atu-surface);
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius-lg);
+    box-shadow: var(--atu-shadow-lg);
+    padding: 2.25rem;
+}
+
+.auth-card .auth-icon {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: rgba(11, 61, 99, 0.08);
+    color: var(--atu-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+    background: linear-gradient(135deg, var(--atu-primary) 0%, var(--atu-primary-dark) 100%);
+    color: #fff;
+    border-radius: var(--atu-radius-lg);
+    padding: 3.5rem 3rem;
+    box-shadow: var(--atu-shadow-lg);
+}
+
+.hero p {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.hero .btn-outline-secondary {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.hero .btn-outline-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: #fff;
+    color: #fff;
+}
+
+.feature-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: rgba(11, 61, 99, 0.08);
+    color: var(--atu-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    margin-bottom: 0.75rem;
+}
+
+/* ---------- Stat tiles (dashboards) ---------- */
+
+.stat-tile {
+    background: var(--atu-surface);
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius);
+    box-shadow: var(--atu-shadow-sm);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-tile .stat-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--atu-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    color: #fff;
+}
+
+.stat-tile .stat-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+.stat-tile .stat-label {
+    color: var(--atu-text-muted);
+    font-size: 0.85rem;
+}
+
+.stat-icon.bg-blue { background-color: var(--atu-primary); }
+.stat-icon.bg-gold { background-color: var(--atu-accent); color: #241a00; }
+.stat-icon.bg-green { background-color: #1e8a5f; }
+.stat-icon.bg-red { background-color: #c8433d; }
+
+/* ---------- Empty states ---------- */
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background: var(--atu-surface);
+    border: 1px dashed var(--atu-border);
+    border-radius: var(--atu-radius);
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    color: var(--atu-text-muted);
+    margin-bottom: 1rem;
+}
+
+/* ---------- Navbar user menu ---------- */
+
+.avatar-circle {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--atu-accent);
+    color: #241a00;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------- Role badges ---------- */
+
+.badge-role-student { background-color: #1e8a5f; }
+.badge-role-staff { background-color: var(--atu-primary); }
+.badge-role-guest { background-color: #6c757d; }
+.badge-role-admin { background-color: var(--atu-accent); color: #241a00; }
+.badge-role-security { background-color: #c8433d; }
+
+/* ---------- Footer ---------- */
+
+footer.bg-dark {
+    background-color: var(--atu-primary-dark) !important;
+}

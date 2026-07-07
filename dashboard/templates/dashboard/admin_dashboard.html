@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <h1 class="h3 mb-1"><i class="bi bi-speedometer2 me-1"></i> Admin Dashboard</h1>
+    <p class="text-muted mb-4">Platform-wide overview.</p>
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-tile">
+                <span class="stat-icon bg-blue"><i class="bi bi-people"></i></span>
+                <div>
+                    <div class="stat-value">{{ total_users }}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-tile">
+                <span class="stat-icon bg-green"><i class="bi bi-mortarboard"></i></span>
+                <div>
+                    <div class="stat-value">{{ total_students }}</div>
+                    <div class="stat-label">Students</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-tile">
+                <span class="stat-icon bg-gold"><i class="bi bi-briefcase"></i></span>
+                <div>
+                    <div class="stat-value">{{ total_staff }}</div>
+                    <div class="stat-label">Staff</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-tile">
+                <span class="stat-icon bg-red"><i class="bi bi-car-front"></i></span>
+                <div>
+                    <div class="stat-value">{{ total_vehicles }}</div>
+                    <div class="stat-label">Registered Vehicles</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-tile">
+                <span class="stat-icon bg-blue"><i class="bi bi-p-square"></i></span>
+                <div>
+                    <div class="stat-value">{{ total_zones }}</div>
+                    <div class="stat-label">Parking Zones</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-tile">
+                <span class="stat-icon bg-green"><i class="bi bi-check-circle"></i></span>
+                <div>
+                    <div class="stat-value">{{ available_slots }}</div>
+                    <div class="stat-label">Slots Available</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-people me-1"></i> User Management</h5>
+                    <p class="card-text text-muted">Manage student, staff, guest, and security accounts.</p>
+                    <a href="{% url 'admin:accounts_user_changelist' %}" class="btn btn-outline-primary btn-sm">
+                        Open in Django Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-car-front me-1"></i> Vehicle Management</h5>
+                    <p class="card-text text-muted">View and manage all registered vehicles.</p>
+                    <a href="{% url 'admin:vehicles_vehicle_changelist' %}" class="btn btn-outline-primary btn-sm">
+                        Open in Django Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-p-square me-1"></i> Zone Management</h5>
+                    <p class="card-text text-muted">Create and configure parking zones and slots.</p>
+                    <a href="{% url 'admin:parking_zone_changelist' %}" class="btn btn-outline-primary btn-sm">
+                        Open in Django Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-graph-up me-1"></i> Usage Analytics</h5>
+                    <p class="card-text text-muted">Reservation trends and occupancy reports.</p>
+                    <span class="badge text-bg-secondary">Coming soon</span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

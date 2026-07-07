@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Parking Zones — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
+        <div>
+            <h1 class="h3 mb-1">Parking Zones</h1>
+            <p class="text-muted mb-0">Live occupancy from parking sensors and gate counters.</p>
+        </div>
+        <div class="small text-muted">
+            <span class="badge text-bg-success">&nbsp;</span> Available
+            <span class="badge text-bg-danger ms-2">&nbsp;</span> Occupied
+            <span class="badge text-bg-warning ms-2">&nbsp;</span> Reserved
+        </div>
+    </div>
+
+    {% if zones %}
+        <div class="row g-3">
+            {% for zone in zones %}
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h5 class="card-title mb-0">{{ zone.name }}</h5>
+                                    <span class="text-muted small">Zone {{ zone.code }}</span>
+                                </div>
+                                {% if zone.capacity %}
+                                    <span class="badge text-bg-{% if zone.current_occupancy >= zone.capacity %}danger{% else %}success{% endif %}">
+                                        {{ zone.current_occupancy }}/{{ zone.capacity }}{% if zone.current_occupancy >= zone.capacity %} FULL{% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="badge text-bg-secondary">{{ zone.current_occupancy }} counted</span>
+                                {% endif %}
+                            </div>
+
+                            {% if zone.capacity %}
+                                <div class="progress mb-3" style="height: 6px;">
+                                    <div class="progress-bar {% if zone.current_occupancy >= zone.capacity %}bg-danger{% else %}bg-success{% endif %}"
+                                         style="width: {% widthratio zone.current_occupancy zone.capacity 100 %}%"></div>
+                                </div>
+                            {% endif %}
+
+                            {% if zone.slots.all %}
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for slot in zone.slots.all %}
+                                        <span class="badge text-bg-{% if slot.status == 'available' %}success{% elif slot.status == 'occupied' %}danger{% else %}warning{% endif %}"
+                                              title="{{ slot }} — {{ slot.get_status_display }}">
+                                            {{ slot.slot_number }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted small mb-0">No individual slots configured — occupancy is gate-counted only.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-p-square"></i>
+            <h5>No parking zones configured yet</h5>
+            <p class="text-muted mb-0">Add zones and slots via the admin to see live occupancy here.</p>
+        </div>
+    {% endif %}
+{% endblock %}

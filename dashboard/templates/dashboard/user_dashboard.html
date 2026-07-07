@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <h1 class="h3 mb-1">Welcome, {{ user.get_full_name|default:user.username }}</h1>
+    <p class="text-muted mb-4">Here's a quick look at your parking account.</p>
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-tile">
+                <span class="stat-icon bg-blue"><i class="bi bi-car-front"></i></span>
+                <div>
+                    <div class="stat-value">{{ vehicle_count }}</div>
+                    <div class="stat-label">My Vehicles</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-tile">
+                <span class="stat-icon bg-gold"><i class="bi bi-calendar-check"></i></span>
+                <div>
+                    <div class="stat-value">—</div>
+                    <div class="stat-label">Active Reservations</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-tile">
+                <span class="stat-icon bg-green"><i class="bi bi-p-square"></i></span>
+                <div>
+                    <div class="stat-value">{{ available_slots }}</div>
+                    <div class="stat-label">Slots Available Now</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-tile">
+                <span class="stat-icon bg-red"><i class="bi bi-bell"></i></span>
+                <div>
+                    <div class="stat-value">—</div>
+                    <div class="stat-label">Unread Notifications</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <div class="feature-icon"><i class="bi bi-car-front"></i></div>
+                    <h5 class="card-title">My Vehicles</h5>
+                    <p class="card-text text-muted">Manage your registered vehicles.</p>
+                    <a href="{% url 'vehicles:list' %}" class="btn btn-outline-primary btn-sm">View</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <div class="feature-icon"><i class="bi bi-calendar-check"></i></div>
+                    <h5 class="card-title">My Reservations</h5>
+                    <p class="card-text text-muted">Track your parking bookings.</p>
+                    <a href="{% url 'reservations:list' %}" class="btn btn-outline-primary btn-sm">View</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <div class="feature-icon"><i class="bi bi-p-square"></i></div>
+                    <h5 class="card-title">Parking Zones</h5>
+                    <p class="card-text text-muted">Check real-time slot availability.</p>
+                    <a href="{% url 'parking:zone_list' %}" class="btn btn-outline-primary btn-sm">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

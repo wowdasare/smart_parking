@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}ATU Smart Parking — Home{% endblock %}
+
+{% block content %}
+    <div class="hero mb-5">
+        <span class="badge bg-white text-primary bg-opacity-75 mb-3 px-3 py-2">
+            <i class="bi bi-mortarboard-fill me-1"></i> Accra Technical University
+        </span>
+        <h1 class="display-6 fw-bold mb-3">Smart Parking, made simple</h1>
+        <p class="col-lg-8 fs-5">
+            Reserve a parking slot before you arrive, get real-time occupancy updates, and let
+            security verify your booking at the gate — all from your phone or laptop.
+        </p>
+        <div class="d-flex gap-2 flex-wrap mt-4">
+            {% if user.is_authenticated %}
+                <a class="btn btn-accent btn-lg" href="{% url 'dashboard:home' %}">
+                    <i class="bi bi-speedometer2 me-1"></i> Go to my dashboard
+                </a>
+            {% else %}
+                <a class="btn btn-accent btn-lg" href="{% url 'accounts:register' %}">Get started</a>
+                <a class="btn btn-outline-secondary btn-lg" href="{% url 'accounts:login' %}">Log in</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <div class="feature-icon"><i class="bi bi-calendar-check"></i></div>
+                    <h5 class="card-title">Reserve ahead</h5>
+                    <p class="text-muted mb-0">Request a slot and track its status from requested to confirmed.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <div class="feature-icon"><i class="bi bi-p-square"></i></div>
+                    <h5 class="card-title">Real-time occupancy</h5>
+                    <p class="text-muted mb-0">See which zones and slots are available, occupied, or reserved.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <div class="feature-icon"><i class="bi bi-bell"></i></div>
+                    <h5 class="card-title">Stay notified</h5>
+                    <p class="text-muted mb-0">Get in-app and email alerts for booking confirmations and status changes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

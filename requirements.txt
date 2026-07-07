@@ -1,0 +1,9 @@
+Django==6.0.6
+django-environ==0.14.0
+djangorestframework==3.17.1
+
+# MySQL driver for production/staging use. Requires system MySQL client libs
+# (macOS: `brew install mysql-client pkg-config`, then
+# `export PKG_CONFIG_PATH="$(brew --prefix mysql-client)/lib/pkgconfig"`
+# before installing). Not needed for local SQLite dev.
+mysqlclient==2.2.7

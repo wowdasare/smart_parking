@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit Vehicle{% else %}Add Vehicle{% endif %} — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="auth-card">
+                <div class="auth-icon"><i class="bi bi-car-front"></i></div>
+                <h1 class="h3 mb-4">{% if form.instance.pk %}Edit Vehicle{% else %}Add Vehicle{% endif %}</h1>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text|safe }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a href="{% url 'vehicles:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}My Vehicles — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">My Vehicles</h1>
+            <p class="text-muted mb-0">Vehicles linked to your profile for parking reservations.</p>
+        </div>
+        <a href="{% url 'vehicles:add' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Add vehicle
+        </a>
+    </div>
+
+    {% if vehicles %}
+        <div class="row g-3">
+            {% for vehicle in vehicles %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-hover h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="feature-icon mb-0">
+                                    {% if vehicle.vehicle_type == 'motorcycle' %}
+                                        <i class="bi bi-scooter"></i>
+                                    {% else %}
+                                        <i class="bi bi-car-front"></i>
+                                    {% endif %}
+                                </div>
+                                <span class="badge text-bg-light border">{{ vehicle.get_vehicle_type_display }}</span>
+                            </div>
+                            <h5 class="card-title mb-1">{{ vehicle.registration_number }}</h5>
+                            <p class="card-text text-muted mb-3">
+                                {{ vehicle.make }} {{ vehicle.model }}{% if vehicle.color %} &middot; {{ vehicle.color }}{% endif %}
+                            </p>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'vehicles:edit' vehicle.pk %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a href="{% url 'vehicles:delete' vehicle.pk %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Remove
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-car-front"></i>
+            <h5>No vehicles yet</h5>
+            <p class="text-muted mb-3">Add your first vehicle to start booking parking slots.</p>
+            <a href="{% url 'vehicles:add' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Add vehicle
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}
