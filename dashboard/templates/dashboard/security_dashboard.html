@@ -3,51 +3,241 @@
 {% block title %}Security Dashboard — ATU Smart Parking{% endblock %}
 
 {% block content %}
-    <h1 class="h3 mb-1"><i class="bi bi-shield-check me-1"></i> Security Dashboard</h1>
-    <p class="text-muted mb-4">Monitor active parking entries and gate activity.</p>
+    <div class="dash-head">
+        <div class="dash-head-text">
+            <h1><i class="bi bi-shield-check me-2"></i>Security Dashboard</h1>
+            <p>Gate activity and live occupancy · {% now "l, j F Y" %}</p>
+        </div>
+        <div class="dash-head-actions">
+            <a class="btn btn-ghost btn-sm" href="{% url 'parking:zone_list' %}">
+                <i class="bi bi-p-square me-1"></i>Zone board
+            </a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'permits:plate_check' %}">
+                <i class="bi bi-upc-scan me-1"></i>Plate check
+            </a>
+            <a class="btn btn-accent btn-sm" href="{% url 'reservations:gate_verify' %}">
+                <i class="bi bi-qr-code-scan me-1"></i>Gate verification
+            </a>
+        </div>
+    </div>
+
+    {% if zones_full %}
+        <div class="alert alert-warning d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <div>
+                <strong>At capacity:</strong>
+                {% for row in zones_full %}{{ row.zone.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                — turn arriving vehicles away or redirect them.
+            </div>
+        </div>
+    {% endif %}
+
+    {% if permits_expiring %}
+        <div class="alert alert-info d-flex align-items-center gap-2">
+            <i class="bi bi-patch-exclamation-fill"></i>
+            <div>
+                {{ permits_expiring|length }} permit{{ permits_expiring|length|pluralize }} expiring within 14 days —
+                <a href="{% url 'permits:plate_check' %}" class="alert-link">review the list</a>.
+            </div>
+        </div>
+    {% endif %}
 
     <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-blue"><i class="bi bi-box-arrow-in-right"></i></span>
-                <div>
-                    <div class="stat-value">{{ active_entries }}</div>
-                    <div class="stat-label">Active Entries</div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--primary">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Vehicles on campus</div>
+                        <div class="kpi-value">{{ on_campus }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-car-front-fill"></i></span>
+                </div>
+                <div class="kpi-foot"><i class="bi bi-graph-up"></i>{{ totals.percent }}% of counted capacity</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--green">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Entries today</div>
+                        <div class="kpi-value">{{ entries_today }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                </div>
+                <div class="kpi-foot"><i class="bi bi-clock"></i>Since midnight</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--slate">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Exits today</div>
+                        <div class="kpi-value">{{ exits_today }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-box-arrow-right"></i></span>
+                </div>
+                <div class="kpi-foot"><i class="bi bi-clock"></i>Since midnight</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--primary">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Bookings today</div>
+                        <div class="kpi-value">{{ confirmed_today }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-calendar-check"></i></span>
+                </div>
+                <div class="kpi-foot"><i class="bi bi-hourglass-split"></i>{{ expected_now|length }} expected right now</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi {% if totals.free %}kpi--accent{% else %}kpi--red{% endif %}">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Spaces free</div>
+                        <div class="kpi-value">{{ totals.free }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-p-circle"></i></span>
+                </div>
+                <div class="kpi-foot"><i class="bi bi-signpost-split"></i>{{ totals.zones_open }} of {{ totals.zone_count }} zone{{ totals.zone_count|pluralize }} open</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-hourglass-split"></i> Expected now</h2>
+                    <a class="small" href="{% url 'reservations:gate_verify' %}">Verify at gate</a>
+                </div>
+                <div class="panel-body is-flush">
+                    {% if expected_now %}
+                        <div class="table-responsive">
+                            <table class="table-clean">
+                                <thead>
+                                <tr><th>Reference</th><th>Vehicle</th><th>Slot</th><th>Until</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for r in expected_now %}
+                                    <tr>
+                                        <td><code>{{ r.reference }}</code></td>
+                                        <td class="cell-strong">{{ r.vehicle.registration_number }}</td>
+                                        <td class="cell-muted">{{ r.slot }}</td>
+                                        <td class="cell-muted">{{ r.end_time|date:"H:i" }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="panel-empty">
+                            <i class="bi bi-hourglass"></i>
+                            <p>No vehicles are expected at this moment.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-gold"><i class="bi bi-calendar-check"></i></span>
-                <div>
-                    <div class="stat-value">—</div>
-                    <div class="stat-label">Confirmed Today</div>
+        <div class="col-lg-6">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-car-front-fill"></i> Currently on site</h2>
+                    <span class="small text-muted">Checked in, not yet out</span>
                 </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-green"><i class="bi bi-p-square"></i></span>
-                <div>
-                    <div class="stat-value">{{ available_slots }}</div>
-                    <div class="stat-label">Slots Available</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-red"><i class="bi bi-exclamation-triangle"></i></span>
-                <div>
-                    <div class="stat-value">—</div>
-                    <div class="stat-label">Flagged / Overstayed</div>
+                <div class="panel-body is-flush">
+                    {% if on_site %}
+                        <div class="table-responsive">
+                            <table class="table-clean">
+                                <thead>
+                                <tr><th>Reference</th><th>Vehicle</th><th>Slot</th><th>Since</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for r in on_site %}
+                                    <tr>
+                                        <td><code>{{ r.reference }}</code></td>
+                                        <td class="cell-strong">{{ r.vehicle.registration_number }}</td>
+                                        <td class="cell-muted">{{ r.slot }}</td>
+                                        <td class="cell-muted">{{ r.checked_in_at|date:"H:i" }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="panel-empty">
+                            <i class="bi bi-car-front"></i>
+                            <p>No vehicles are currently checked in.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="empty-state">
-        <i class="bi bi-shield-check"></i>
-        <h5>Active entry management is coming soon</h5>
-        <p class="text-muted mb-0">This is where security staff will verify confirmed reservations and manually update slot status at the gate.</p>
+    <div class="row g-3 mb-4">
+        <div class="col-lg-7">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-door-open"></i> Latest gate events</h2>
+                    <span class="small text-muted">Newest first</span>
+                </div>
+                <div class="panel-body is-flush">
+                    {% if recent_events %}
+                        <div class="table-responsive">
+                            <table class="table-clean">
+                                <thead>
+                                <tr>
+                                    <th>Direction</th>
+                                    <th>Zone</th>
+                                    <th>Plate</th>
+                                    <th>Device</th>
+                                    <th>Time</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for event in recent_events %}
+                                    <tr>
+                                        <td>
+                                            {% if event.event_type == 'entry' %}
+                                                <span class="slot-chip is-available"><i class="bi bi-box-arrow-in-right"></i> Entry</span>
+                                            {% else %}
+                                                <span class="slot-chip is-reserved"><i class="bi bi-box-arrow-right"></i> Exit</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="cell-strong">{{ event.zone.name }}</td>
+                                        <td>{{ event.plate_number|default:"—" }}</td>
+                                        <td class="cell-muted">{{ event.device.device_id|default:"—" }}</td>
+                                        <td class="cell-muted">{{ event.recorded_at|date:"j M, H:i" }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="panel-empty">
+                            <i class="bi bi-door-closed"></i>
+                            <p>No gate events recorded yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="d-flex flex-column gap-3 h-100">
+                {% include 'dashboard/partials/_occupancy_panel.html' %}
+                {% include 'dashboard/partials/_slot_mix_panel.html' %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            {% include 'dashboard/partials/_activity_panel.html' %}
+        </div>
+        <div class="col-lg-6">
+            {% include 'dashboard/partials/_device_panel.html' %}
+        </div>
     </div>
 {% endblock %}

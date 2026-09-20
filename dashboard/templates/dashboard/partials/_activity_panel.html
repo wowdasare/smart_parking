@@ -1,0 +1,34 @@
+{# Expects: activity (from _slot_activity) #}
+<div class="panel">
+    <div class="panel-head">
+        <h2 class="panel-title"><i class="bi bi-clock-history"></i> Recent slot activity</h2>
+    </div>
+    <div class="panel-body">
+        {% if activity %}
+            <ul class="timeline">
+                {% for item in activity %}
+                    <li class="{{ item.tone }}">
+                        <span class="tl-text">
+                            <strong>{{ item.log.slot }}</strong>
+                            {% if item.log.applied %}
+                                {{ item.log.get_previous_status_display|lower }} &rarr;
+                                <strong>{{ item.log.get_attempted_status_display|lower }}</strong>
+                            {% else %}
+                                <span class="text-danger">rejected</span>
+                                {{ item.log.get_attempted_status_display|lower }} (manual override active)
+                            {% endif %}
+                        </span>
+                        <span class="tl-time">
+                            {{ item.log.get_source_display }} · {{ item.actor }} · {{ item.log.changed_at|date:"j M, H:i" }}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="panel-empty">
+                <i class="bi bi-clock-history"></i>
+                <p>No slot status changes recorded yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>

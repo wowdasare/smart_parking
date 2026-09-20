@@ -1,8 +1,11 @@
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404, render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.models import User
 from parking.models import ParkingSlot, Zone
 from parking.services import update_slot_status
 
@@ -85,3 +88,35 @@ class GateEventView(APIView):
             'current_occupancy': zone.current_occupancy,
             'capacity': zone.capacity,
         })
+
+
+# --------------------------------------------------------------------------
+# Web page: sensor simulator
+# --------------------------------------------------------------------------
+# A phone-friendly stand-in for physical hardware. Each button on the page
+# fires the *same* authenticated HTTP request an ESP32 device would send to
+# the API views above, so the whole slot/gate pipeline can be demoed with no
+# hardware at all. Admin-gated because the page embeds device API keys so the
+# browser can authenticate as each device.
+
+@login_required
+def simulator(request):
+    if not (request.user.is_superuser or request.user.role == User.Role.ADMIN):
+        raise PermissionDenied('Administrator access is required for the sensor simulator.')
+
+    slot_devices = SensorDevice.objects.filter(
+        device_type=SensorDevice.DeviceType.SLOT_SENSOR,
+        is_active=True,
+        slot__isnull=False,
+    ).select_related('slot', 'slot__zone')
+
+    gate_devices = SensorDevice.objects.filter(
+        device_type=SensorDevice.DeviceType.GATE_SENSOR,
+        is_active=True,
+        zone__isnull=False,
+    ).select_related('zone')
+
+    return render(request, 'sensors/simulator.html', {
+        'slot_devices': slot_devices,
+        'gate_devices': gate_devices,
+    })

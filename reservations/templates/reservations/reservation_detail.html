@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking {{ reservation.reference }} — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <div class="page-head">
+        <div>
+            <h1 class="page-title"><i class="bi bi-calendar-check"></i> Booking {{ reservation.reference }}</h1>
+            <p class="page-sub">
+                <span class="badge text-bg-{{ reservation.status_tone }}">{{ reservation.get_status_display }}</span>
+                <span class="ms-2">Booked {{ reservation.created_at|date:"j M Y, H:i" }}</span>
+            </p>
+        </div>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'reservations:list' %}">
+            <i class="bi bi-arrow-left me-1"></i>All bookings
+        </a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-info-circle"></i> Booking details</h2>
+                </div>
+                <div class="panel-body is-flush">
+                    <table class="table-clean">
+                        <tbody>
+                        <tr>
+                            <th class="text-muted small">Slot</th>
+                            <td class="cell-strong">{{ reservation.slot }} — {{ reservation.zone.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted small">Vehicle</th>
+                            <td>
+                                {{ reservation.vehicle.registration_number }}
+                                <span class="cell-muted">({{ reservation.vehicle.make }} {{ reservation.vehicle.model }})</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted small">Booked by</th>
+                            <td>{{ reservation.user.get_full_name|default:reservation.user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted small">Arriving</th>
+                            <td>{{ reservation.start_time|date:"l, j F Y — H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted small">Leaving by</th>
+                            <td>{{ reservation.end_time|date:"l, j F Y — H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted small">Duration</th>
+                            <td>{{ reservation.duration_hours }} hour{{ reservation.duration_hours|pluralize }}</td>
+                        </tr>
+                        {% if reservation.checked_in_at %}
+                            <tr>
+                                <th class="text-muted small">Checked in</th>
+                                <td>{{ reservation.checked_in_at|date:"j M Y, H:i" }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if reservation.checked_out_at %}
+                            <tr>
+                                <th class="text-muted small">Checked out</th>
+                                <td>{{ reservation.checked_out_at|date:"j M Y, H:i" }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if reservation.cancelled_at %}
+                            <tr>
+                                <th class="text-muted small">Cancelled</th>
+                                <td>{{ reservation.cancelled_at|date:"j M Y, H:i" }}</td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if reservation.can_cancel %}
+                    <div class="panel-foot">
+                        <a class="btn btn-outline-danger btn-sm" href="{% url 'reservations:cancel' reservation.pk %}">
+                            <i class="bi bi-x-circle me-1"></i>Cancel this booking
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="panel mb-3">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-shield-check"></i> Gate reference</h2>
+                </div>
+                <div class="panel-body text-center">
+                    <p class="text-muted small mb-2">Show this to security at the gate</p>
+                    <div class="kpi-value mb-2" style="font-size: 2.1rem; letter-spacing: 0.05em;">
+                        {{ reservation.reference }}
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Registered to {{ reservation.vehicle.registration_number }}
+                    </p>
+                </div>
+            </div>
+
+            {% if is_gate_staff %}
+                <div class="panel">
+                    <div class="panel-head">
+                        <h2 class="panel-title"><i class="bi bi-door-open"></i> Gate actions</h2>
+                    </div>
+                    <div class="panel-body">
+                        {% if reservation.status == 'confirmed' %}
+                            <form method="post" action="{% url 'reservations:gate_action' reservation.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="check_in">
+                                <button class="btn btn-primary btn-sm w-100">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>Check vehicle in
+                                </button>
+                            </form>
+                        {% elif reservation.status == 'active' %}
+                            <form method="post" action="{% url 'reservations:gate_action' reservation.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="check_out">
+                                <button class="btn btn-accent btn-sm w-100">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Check vehicle out
+                                </button>
+                            </form>
+                        {% else %}
+                            <p class="text-muted small mb-0">
+                                No gate action available for a
+                                {{ reservation.get_status_display|lower }} booking.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

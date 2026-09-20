@@ -1,56 +1,336 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}ATU Smart Parking — Home{% endblock %}
 
 {% block content %}
-    <div class="hero mb-5">
-        <span class="badge bg-white text-primary bg-opacity-75 mb-3 px-3 py-2">
-            <i class="bi bi-mortarboard-fill me-1"></i> Accra Technical University
-        </span>
+<div class="hero hero-slider mb-5">
+    <div id="heroCarousel" class="carousel slide carousel-fade hero-bg" data-bs-ride="carousel"
+         data-bs-interval="4500">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"
+                    aria-current="true" aria-label="Campus photo 1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"
+                    aria-label="Campus photo 2"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"
+                    aria-label="Campus photo 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'img/atu-cover-img1.jpg' %}" alt="Accra Technical University main entrance">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'img/atu-cover-img2.png' %}" alt="Accra Technical University campus">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'img/atu-cover-img-3.jpg' %}" alt="Accra Technical University campus">
+            </div>
+        </div>
+    </div>
+
+    <img class="hero-crest d-none d-lg-block" src="{% static 'img/atu-badge.png' %}" alt="">
+
+    <div class="hero-content">
+            <span class="badge bg-white bg-opacity-75 text-primary mb-3 px-3 py-2 d-inline-flex align-items-center gap-2">
+                <img src="{% static 'img/atu-badge.png' %}" alt="" height="20">
+                Accra Technical University
+            </span>
         <h1 class="display-6 fw-bold mb-3">Smart Parking, made simple</h1>
-        <p class="col-lg-8 fs-5">
+        <p class="col-lg-7 fs-5">
             Reserve a parking slot before you arrive, get real-time occupancy updates, and let
             security verify your booking at the gate — all from your phone or laptop.
         </p>
         <div class="d-flex gap-2 flex-wrap mt-4">
             {% if user.is_authenticated %}
-                <a class="btn btn-accent btn-lg" href="{% url 'dashboard:home' %}">
-                    <i class="bi bi-speedometer2 me-1"></i> Go to my dashboard
-                </a>
+            <a class="btn btn-accent btn-lg" href="{% url 'dashboard:home' %}">
+                <i class="bi bi-speedometer2 me-1"></i> Go to my dashboard
+            </a>
             {% else %}
-                <a class="btn btn-accent btn-lg" href="{% url 'accounts:register' %}">Get started</a>
-                <a class="btn btn-outline-secondary btn-lg" href="{% url 'accounts:login' %}">Log in</a>
+            <a class="btn btn-accent btn-lg" href="{% url 'accounts:register' %}">Get started</a>
+            <a class="btn btn-outline-secondary btn-lg" href="{% url 'accounts:login' %}">Log in</a>
             {% endif %}
         </div>
     </div>
+</div>
 
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card card-hover h-100">
-                <div class="card-body">
-                    <div class="feature-icon"><i class="bi bi-calendar-check"></i></div>
-                    <h5 class="card-title">Reserve ahead</h5>
-                    <p class="text-muted mb-0">Request a slot and track its status from requested to confirmed.</p>
-                </div>
+{# ---------- What you can do ---------- #}
+<div class="section-head">
+    <span class="section-eyebrow">What you can do</span>
+    <h2>Everything for campus parking, in one place</h2>
+    <p>From a standing permit down to a single afternoon's bay — with the gate checks that make both mean something.</p>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <div class="feature-icon"><i class="bi bi-calendar-check"></i></div>
+                <h5 class="card-title">Reserve a bay</h5>
+                <p class="text-muted mb-0">
+                    Book a specific slot for a specific window and get a gate reference to show
+                    security on arrival.
+                </p>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card card-hover h-100">
-                <div class="card-body">
-                    <div class="feature-icon"><i class="bi bi-p-square"></i></div>
-                    <h5 class="card-title">Real-time occupancy</h5>
-                    <p class="text-muted mb-0">See which zones and slots are available, occupied, or reserved.</p>
-                </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <div class="feature-icon"><i class="bi bi-patch-check"></i></div>
+                <h5 class="card-title">Apply for a permit</h5>
+                <p class="text-muted mb-0">
+                    Student, staff, visitor, or contractor cover — reviewed by the parking office,
+                    with the fee and validity tracked.
+                </p>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card card-hover h-100">
-                <div class="card-body">
-                    <div class="feature-icon"><i class="bi bi-bell"></i></div>
-                    <h5 class="card-title">Stay notified</h5>
-                    <p class="text-muted mb-0">Get in-app and email alerts for booking confirmations and status changes.</p>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <div class="feature-icon"><i class="bi bi-p-square"></i></div>
+                <h5 class="card-title">Real-time occupancy</h5>
+                <p class="text-muted mb-0">
+                    See which zones and bays are available, occupied, or reserved before you
+                    leave the house.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+                <h5 class="card-title">Verified at the gate</h5>
+                <p class="text-muted mb-0">
+                    Security checks a booking reference or a number plate and waves you through —
+                    or doesn't.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <div class="feature-icon"><i class="bi bi-bell"></i></div>
+                <h5 class="card-title">Stay notified</h5>
+                <p class="text-muted mb-0">
+                    You'll get alerts on your dashboard and by email for booking confirmations
+                    and status changes.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <div class="feature-icon"><i class="bi bi-cpu"></i></div>
+                <h5 class="card-title">Sensor-backed</h5>
+                <p class="text-muted mb-0">
+                    Slot and gate sensors report occupancy over an authenticated API, with every
+                    change logged and auditable.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ---------- How it works ---------- #}
+<div class="section section-tint rounded-4 mb-5 px-3">
+    <div class="section-head">
+        <span class="section-eyebrow">How it works</span>
+        <h2>Four steps from sign-up to parked</h2>
+    </div>
+    <div class="row g-4 step-row">
+        <div class="col-6 col-md-3">
+            <div class="step">
+                <div class="step-num">1</div>
+                <h5>Register your vehicle</h5>
+                <p>Add your plate, make, and model to your account.</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="step">
+                <div class="step-num">2</div>
+                <h5>Get a permit</h5>
+                <p>Apply once per term or year; the parking office approves it.</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="step">
+                <div class="step-num">3</div>
+                <h5>Book a bay</h5>
+                <p>Reserve a slot for the hours you need and keep the reference.</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="step">
+                <div class="step-num">4</div>
+                <h5>Drive in</h5>
+                <p>Security verifies you at the gate and your slot is marked in use.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ---------- Built for everyone on campus ---------- #}
+<div class="section-head">
+    <span class="section-eyebrow">Who it's for</span>
+    <h2>Built for everyone on campus</h2>
+    <p>Each role signs in to a dashboard shaped around the job they actually do.</p>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-lg-4">
+        <div class="role-card role-driver">
+            <div class="role-icon"><i class="bi bi-mortarboard"></i></div>
+            <h5>Students &amp; staff</h5>
+            <div class="role-who">Drivers</div>
+            <ul>
+                <li>Register vehicles to your own account</li>
+                <li>Apply for and track a parking permit</li>
+                <li>Book a bay and cancel if plans change</li>
+                <li>See live availability before you set off</li>
+                <li>Get confirmations on-site and by email</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="role-card role-security">
+            <div class="role-icon"><i class="bi bi-shield-check"></i></div>
+            <h5>Security staff</h5>
+            <div class="role-who">At the gate</div>
+            <ul>
+                <li>Verify a booking by its reference</li>
+                <li>Check whether a plate holds a valid permit</li>
+                <li>Check vehicles in and out, updating the bay</li>
+                <li>See who is expected now and who is on site</li>
+                <li>Watch zone occupancy and sensor health</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="role-card role-office">
+            <div class="role-icon"><i class="bi bi-buildings"></i></div>
+            <h5>Parking office</h5>
+            <div class="role-who">Administrators</div>
+            <ul>
+                <li>Approve, reject, and revoke permit applications</li>
+                <li>Record permit fees as paid</li>
+                <li>Manage accounts, vehicles, zones, and bays</li>
+                <li>Review every booking on the platform</li>
+                <li>Audit slot changes and sensor reports</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{# ---------- FAQ ---------- #}
+<div class="section-head">
+    <span class="section-eyebrow">Questions</span>
+    <h2>Common questions</h2>
+</div>
+
+<div class="row justify-content-center mb-5">
+    <div class="col-lg-9">
+        <div class="accordion faq" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq1">
+                        Do I need a permit and a booking?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        They answer different questions. A permit is your standing right to park on
+                        campus for a term or a year. A booking holds one specific bay for a few
+                        hours. Security can check either at the gate.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq2">
+                        How far ahead can I book?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Any time from now onwards. A single booking can run up to 24 hours, and you
+                        can cancel free of charge until the vehicle is checked in at the gate.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq3">
+                        What if the bay I booked is taken?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Two bookings can never overlap on the same bay — the system refuses the
+                        second one. If a bay is physically blocked anyway, security can move you and
+                        update the slot status on the spot.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq4">
+                        How much does a permit cost?
+                    </button>
+                </h2>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Standard fees are GHS 50 for a student semester permit, GHS 120 for a staff
+                        academic year, GHS 10 for a short visitor stay, and GHS 200 for contractors.
+                        Fees are payable at the parking office once your application is approved.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq5">
+                        Who can see my details?
+                    </button>
+                </h2>
+                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Only you and the staff who need them. Your vehicles, bookings, and permits
+                        are scoped to your account; security sees the booking and permit status of a
+                        vehicle at the gate, and the parking office sees applications it has to
+                        decide on.
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+{# ---------- Closing CTA ---------- #}
+<div class="cta-band mb-4">
+    {% if user.is_authenticated %}
+    <h2>Welcome back, {{ user.get_full_name|default:user.username }}</h2>
+    <p>Your dashboard has your bookings, permit standing, and live availability.</p>
+    <a class="btn btn-accent btn-lg" href="{% url 'dashboard:home' %}">
+        <i class="bi bi-speedometer2 me-1"></i>Go to my dashboard
+    </a>
+    {% else %}
+    <h2>Ready to stop circling the car park?</h2>
+    <p>
+        Create an account with your ATU email, register your vehicle, and book your first
+        bay in a couple of minutes.
+    </p>
+    <div class="d-flex gap-2 justify-content-center flex-wrap">
+        <a class="btn btn-accent btn-lg" href="{% url 'accounts:register' %}">Get started</a>
+        <a class="btn btn-outline-light btn-lg" href="{% url 'accounts:login' %}">I already have an account</a>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

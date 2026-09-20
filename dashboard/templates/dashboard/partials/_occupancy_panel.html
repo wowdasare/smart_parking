@@ -1,0 +1,45 @@
+{# Expects: zone_rows, totals #}
+<div class="panel">
+    <div class="panel-head">
+        <h2 class="panel-title"><i class="bi bi-p-square"></i> Zone occupancy</h2>
+        {% if totals.capacity %}
+            <span class="small text-muted">{{ totals.occupancy }} of {{ totals.capacity }} spaces in use</span>
+        {% endif %}
+    </div>
+    <div class="panel-body">
+        {% for row in zone_rows %}
+            <div class="occ-row {{ row.level }}">
+                <div class="occ-name">
+                    {{ row.zone.name }}<span class="occ-code">Zone {{ row.zone.code }}</span>
+                </div>
+                <div class="occ-count">
+                    {% if row.capacity %}
+                        {{ row.occupancy }}<small>/{{ row.capacity }}</small>
+                    {% else %}
+                        {{ row.occupancy }}<small> counted</small>
+                    {% endif %}
+                </div>
+                <div class="occ-bar">
+                    <span style="width: {{ row.percent|default:0 }}%"></span>
+                </div>
+                <div class="occ-note">
+                    {% if row.capacity %}
+                        {% if row.is_full %}
+                            <span class="text-danger fw-semibold">Full</span> — no spaces left
+                        {% else %}
+                            {{ row.free }} space{{ row.free|pluralize }} free · {{ row.percent }}% occupied
+                        {% endif %}
+                    {% else %}
+                        Gate-counted only — no capacity set for this zone
+                    {% endif %}
+                    {% if row.slot_total %}· {{ row.slot_total }} sensor slot{{ row.slot_total|pluralize }}{% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="panel-empty">
+                <i class="bi bi-p-square"></i>
+                <p>No parking zones configured yet.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>

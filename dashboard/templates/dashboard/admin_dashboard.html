@@ -3,111 +3,261 @@
 {% block title %}Admin Dashboard — ATU Smart Parking{% endblock %}
 
 {% block content %}
-    <h1 class="h3 mb-1"><i class="bi bi-speedometer2 me-1"></i> Admin Dashboard</h1>
-    <p class="text-muted mb-4">Platform-wide overview.</p>
+    <div class="dash-head">
+        <div class="dash-head-text">
+            <h1><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h1>
+            <p>Platform-wide overview · {% now "l, j F Y" %}</p>
+        </div>
+        <div class="dash-head-actions">
+            <a class="btn btn-ghost btn-sm" href="{% url 'dashboard:manage_users' %}">
+                <i class="bi bi-people me-1"></i>Users
+            </a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'dashboard:manage_vehicles' %}">
+                <i class="bi bi-car-front me-1"></i>Vehicles
+            </a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'reservations:list' %}">
+                <i class="bi bi-calendar-check me-1"></i>Bookings
+            </a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'permits:list' %}">
+                <i class="bi bi-patch-check me-1"></i>Permits
+            </a>
+            <a class="btn btn-accent btn-sm" href="{% url 'dashboard:manage_zones' %}">
+                <i class="bi bi-p-square me-1"></i>Zones &amp; slots
+            </a>
+        </div>
+    </div>
 
     <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-blue"><i class="bi bi-people"></i></span>
-                <div>
-                    <div class="stat-value">{{ total_users }}</div>
-                    <div class="stat-label">Total Users</div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--primary">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Total users</div>
+                        <div class="kpi-value">{{ total_users }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-people"></i></span>
                 </div>
+                <div class="kpi-foot"><i class="bi bi-person-check"></i>{{ active_users }} active account{{ active_users|pluralize }}</div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-green"><i class="bi bi-mortarboard"></i></span>
-                <div>
-                    <div class="stat-value">{{ total_students }}</div>
-                    <div class="stat-label">Students</div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--slate">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Registered vehicles</div>
+                        <div class="kpi-value">{{ total_vehicles }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-car-front"></i></span>
                 </div>
+                <div class="kpi-foot"><i class="bi bi-plus-circle"></i>{{ vehicles_added_week }} added this week</div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-gold"><i class="bi bi-briefcase"></i></span>
-                <div>
-                    <div class="stat-value">{{ total_staff }}</div>
-                    <div class="stat-label">Staff</div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--green">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Live bookings</div>
+                        <div class="kpi-value">{{ live_bookings }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-calendar-check"></i></span>
                 </div>
+                <div class="kpi-foot"><i class="bi bi-calendar-day"></i>{{ bookings_today }} starting today</div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-red"><i class="bi bi-car-front"></i></span>
-                <div>
-                    <div class="stat-value">{{ total_vehicles }}</div>
-                    <div class="stat-label">Registered Vehicles</div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi {% if permits_pending %}kpi--red{% else %}kpi--slate{% endif %}">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Permits to review</div>
+                        <div class="kpi-value">{{ permits_pending }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-patch-check"></i></span>
+                </div>
+                <div class="kpi-foot"><i class="bi bi-check2-circle"></i>{{ permits_active }} active · {{ permits_unpaid }} unpaid</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--accent">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Campus occupancy</div>
+                        <div class="kpi-value">{{ totals.percent }}<small>%</small></div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-graph-up"></i></span>
+                </div>
+                <div class="kpi-foot"><i class="bi bi-p-circle"></i>{{ totals.occupancy }} of {{ totals.capacity }} spaces used</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--primary">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Spaces free</div>
+                        <div class="kpi-value">{{ totals.free }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-check-circle"></i></span>
+                </div>
+                <div class="kpi-foot"><i class="bi bi-signpost-split"></i>{{ totals.zones_open }} of {{ totals.zone_count }} zone{{ totals.zone_count|pluralize }} open</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-7">
+            {% include 'dashboard/partials/_occupancy_panel.html' %}
+        </div>
+        <div class="col-lg-5">
+            <div class="d-flex flex-column gap-3 h-100">
+                {% include 'dashboard/partials/_slot_mix_panel.html' %}
+                <div class="panel">
+                    <div class="panel-head">
+                        <h2 class="panel-title"><i class="bi bi-door-open"></i> Gate traffic today</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row text-center g-3">
+                            <div class="col-6 border-end">
+                                <div class="kpi-value text-success">{{ entries_today }}</div>
+                                <div class="kpi-label mt-1">Entries</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="kpi-value">{{ exits_today }}</div>
+                                <div class="kpi-label mt-1">Exits</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-blue"><i class="bi bi-p-square"></i></span>
-                <div>
-                    <div class="stat-value">{{ total_zones }}</div>
-                    <div class="stat-label">Parking Zones</div>
+        <div class="col-lg-4">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-person-badge"></i> Users by role</h2>
+                </div>
+                <div class="panel-body is-flush">
+                    <table class="table-clean">
+                        <tbody>
+                        {% for row in role_rows %}
+                            <tr>
+                                <td class="cell-strong">{{ row.label }}</td>
+                                <td class="text-end fw-semibold">{{ row.count }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel-foot">
+                    <a class="small" href="{% url 'dashboard:manage_users' %}">Manage user accounts <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-green"><i class="bi bi-check-circle"></i></span>
-                <div>
-                    <div class="stat-value">{{ available_slots }}</div>
-                    <div class="stat-label">Slots Available</div>
+        <div class="col-lg-8">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-calendar-check"></i> Latest bookings</h2>
+                    <a class="small" href="{% url 'reservations:list' %}">All {{ total_bookings }}</a>
+                </div>
+                <div class="panel-body is-flush">
+                    {% if recent_bookings %}
+                        <div class="table-responsive">
+                            <table class="table-clean">
+                                <thead>
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Booked by</th>
+                                    <th>Slot</th>
+                                    <th>Window</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for r in recent_bookings %}
+                                    <tr>
+                                        <td><code>{{ r.reference }}</code></td>
+                                        <td class="cell-strong">{{ r.user.get_full_name|default:r.user.username }}</td>
+                                        <td class="cell-muted">{{ r.slot }}</td>
+                                        <td class="cell-muted">{{ r.start_time|date:"j M, H:i" }}</td>
+                                        <td><span class="badge text-bg-{{ r.status_tone }}">{{ r.get_status_display }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="panel-empty">
+                            <i class="bi bi-calendar-x"></i>
+                            <p>No bookings have been made yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-patch-check"></i> Permit applications awaiting review</h2>
+                    <a class="small" href="{% url 'permits:list' %}">All permits</a>
+                </div>
+                <div class="panel-body is-flush">
+                    {% if pending_permits %}
+                        <div class="table-responsive">
+                            <table class="table-clean">
+                                <thead>
+                                <tr>
+                                    <th>Applicant</th>
+                                    <th>Vehicle</th>
+                                    <th>Type</th>
+                                    <th>Requested cover</th>
+                                    <th>Fee</th>
+                                    <th>Applied</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for permit in pending_permits %}
+                                    <tr>
+                                        <td>
+                                            <span class="cell-strong d-block">{{ permit.holder.get_full_name|default:permit.holder.username }}</span>
+                                            <span class="badge rounded-pill badge-role-{{ permit.holder.role }}">{{ permit.holder.get_role_display }}</span>
+                                        </td>
+                                        <td class="cell-strong">{{ permit.vehicle.registration_number }}</td>
+                                        <td class="cell-muted">
+                                            {{ permit.get_permit_type_display }}
+                                            <div>{{ permit.zone_label }}</div>
+                                        </td>
+                                        <td class="cell-muted">{{ permit.valid_from|date:"j M Y" }} &rarr; {{ permit.valid_until|date:"j M Y" }}</td>
+                                        <td class="cell-muted">GHS {{ permit.fee_amount }}</td>
+                                        <td class="cell-muted">{{ permit.created_at|date:"j M, H:i" }}</td>
+                                        <td class="text-end">
+                                            <a class="btn btn-primary btn-sm" href="{% url 'permits:detail' permit.pk %}">Review</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="panel-empty">
+                            <i class="bi bi-check2-all"></i>
+                            <p>Nothing awaiting review — the permit queue is clear.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
     <div class="row g-3">
-        <div class="col-md-6 col-lg-3">
-            <div class="card card-hover h-100">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-people me-1"></i> User Management</h5>
-                    <p class="card-text text-muted">Manage student, staff, guest, and security accounts.</p>
-                    <a href="{% url 'admin:accounts_user_changelist' %}" class="btn btn-outline-primary btn-sm">
-                        Open in Django Admin
-                    </a>
-                </div>
-            </div>
+        <div class="col-lg-6">
+            {% include 'dashboard/partials/_activity_panel.html' %}
         </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card card-hover h-100">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-car-front me-1"></i> Vehicle Management</h5>
-                    <p class="card-text text-muted">View and manage all registered vehicles.</p>
-                    <a href="{% url 'admin:vehicles_vehicle_changelist' %}" class="btn btn-outline-primary btn-sm">
-                        Open in Django Admin
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card card-hover h-100">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-p-square me-1"></i> Zone Management</h5>
-                    <p class="card-text text-muted">Create and configure parking zones and slots.</p>
-                    <a href="{% url 'admin:parking_zone_changelist' %}" class="btn btn-outline-primary btn-sm">
-                        Open in Django Admin
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-graph-up me-1"></i> Usage Analytics</h5>
-                    <p class="card-text text-muted">Reservation trends and occupancy reports.</p>
-                    <span class="badge text-bg-secondary">Coming soon</span>
-                </div>
-            </div>
+        <div class="col-lg-6">
+            {% include 'dashboard/partials/_device_panel.html' %}
         </div>
     </div>
 {% endblock %}

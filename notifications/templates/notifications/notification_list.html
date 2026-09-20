@@ -3,8 +3,62 @@
 {% block title %}Notifications — ATU Smart Parking{% endblock %}
 
 {% block content %}
-    <h1 class="h3 mb-4">Notifications</h1>
-    <div class="alert alert-secondary">
-        In-app alerts (booking confirmations, status updates) are coming soon.
+    <div class="page-head">
+        <div>
+            <h1 class="page-title"><i class="bi bi-bell"></i> Notifications</h1>
+            <p class="page-sub">
+                Booking confirmations and status updates. These are also sent to your email.
+            </p>
+        </div>
+        {% if unread_count %}
+            <form method="post" action="{% url 'notifications:mark_read' %}">
+                {% csrf_token %}
+                <button class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-check2-all me-1"></i>Mark all {{ unread_count }} as read
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <div class="panel">
+        <div class="panel-body is-flush">
+            {% if notifications %}
+                <table class="table-clean">
+                    <tbody>
+                    {% for note in notifications %}
+                        <tr>
+                            <td style="width: 3rem;">
+                                {% if note.category == 'booking' %}
+                                    <span class="kpi-icon" style="--kpi-soft: rgba(30,138,95,.13); --kpi-color: #1e8a5f;">
+                                        <i class="bi bi-calendar-check"></i></span>
+                                {% elif note.category == 'status_change' %}
+                                    <span class="kpi-icon" style="--kpi-soft: rgba(242,169,0,.18); --kpi-color: #cf8f00;">
+                                        <i class="bi bi-arrow-repeat"></i></span>
+                                {% else %}
+                                    <span class="kpi-icon"><i class="bi bi-info-circle"></i></span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="{% if not note.is_read %}fw-semibold{% endif %}">{{ note.message }}</span>
+                                <div class="cell-muted">
+                                    {{ note.get_category_display }} · {{ note.created_at|date:"j M Y, H:i" }}
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                {% if not note.is_read %}
+                                    <span class="badge text-bg-primary">New</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="panel-empty">
+                    <i class="bi bi-bell-slash"></i>
+                    <p>No alerts yet. Book a parking slot and your confirmation will appear here.</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

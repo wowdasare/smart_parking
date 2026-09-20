@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ permit.permit_number|default:"Permit application" }} — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <div class="page-head">
+        <div>
+            <h1 class="page-title">
+                <i class="bi bi-patch-check"></i>
+                {{ permit.permit_number|default:"Permit application" }}
+            </h1>
+            <p class="page-sub d-flex align-items-center gap-2 flex-wrap">
+                <span class="badge text-bg-{{ permit.status_tone }}">{{ permit.get_status_display }}</span>
+                <span>{{ permit.get_permit_type_display }}</span>
+                <span class="text-muted">·</span>
+                <span>{{ permit.vehicle.registration_number }}</span>
+                <span class="text-muted">·</span>
+                <span>Applied {{ permit.created_at|date:"j M Y, H:i" }}</span>
+            </p>
+        </div>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'permits:list' %}">
+            <i class="bi bi-arrow-left me-1"></i>All permits
+        </a>
+    </div>
+
+    {% if permit.expires_soon %}
+        <div class="alert alert-warning d-flex align-items-center gap-2">
+            <i class="bi bi-hourglass-split"></i>
+            <div>This permit expires in {{ permit.days_remaining }} day{{ permit.days_remaining|pluralize }}
+                ({{ permit.valid_until|date:"j M Y" }}). Apply for a new one to avoid a gap in cover.</div>
+        </div>
+    {% elif permit.review_note and permit.status != 'active' %}
+        <div class="alert alert-{% if permit.status == 'rejected' or permit.status == 'revoked' %}danger{% else %}secondary{% endif %} d-flex align-items-start gap-2">
+            <i class="bi bi-chat-left-quote"></i>
+            <div><strong>Note from the parking office:</strong> {{ permit.review_note }}</div>
+        </div>
+    {% endif %}
+
+    <div class="row g-3">
+        {# ---------------- Left: the application itself ---------------- #}
+        <div class="col-lg-8">
+            <div class="panel mb-3">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-info-circle"></i> Application details</h2>
+                    <span class="small text-muted">{{ permit.zone_label }}</span>
+                </div>
+                <div class="panel-body is-flush">
+                    <div class="def-grid">
+                        <div>
+                            <div class="def-key">Vehicle</div>
+                            <div class="def-val">
+                                {{ permit.vehicle.registration_number }}
+                                <span class="sub">{{ permit.vehicle.make }} {{ permit.vehicle.model }}{% if permit.vehicle.color %} · {{ permit.vehicle.color }}{% endif %}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="def-key">Permit type</div>
+                            <div class="def-val">
+                                {{ permit.get_permit_type_display }}
+                                <span class="sub">{{ permit.get_status_display }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="def-key">Cover from</div>
+                            <div class="def-val">
+                                {{ permit.valid_from|date:"j M Y" }}
+                                <span class="sub">{{ permit.valid_from|date:"l" }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="def-key">Cover until</div>
+                            <div class="def-val">
+                                {{ permit.valid_until|date:"j M Y" }}
+                                <span class="sub">
+                                    {% if permit.is_current %}
+                                        {{ permit.days_remaining }} day{{ permit.days_remaining|pluralize }} remaining
+                                    {% else %}
+                                        {{ permit.valid_until|date:"l" }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="def-key">Valid in</div>
+                            <div class="def-val">
+                                {{ permit.zone_label }}
+                                <span class="sub">{% if permit.zone %}Zone {{ permit.zone.code }} only{% else %}Any campus zone{% endif %}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="def-key">Permit number</div>
+                            <div class="def-val">
+                                {% if permit.permit_number %}
+                                    <code>{{ permit.permit_number }}</code>
+                                {% else %}
+                                    <span class="text-muted">Issued on approval</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if permit.applicant_note %}
+                            <div class="def-wide">
+                                <div class="def-key">Note from the applicant</div>
+                                <div class="def-val fw-normal">{{ permit.applicant_note }}</div>
+                            </div>
+                        {% endif %}
+                        {% if permit.reviewed_at %}
+                            <div class="def-wide">
+                                <div class="def-key">Reviewed</div>
+                                <div class="def-val fw-normal">
+                                    {{ permit.reviewed_at|date:"j M Y, H:i" }}
+                                    {% if permit.reviewed_by %}
+                                        by {{ permit.reviewed_by.get_full_name|default:permit.reviewed_by.username }}
+                                    {% endif %}
+                                    {% if permit.review_note %}<span class="sub">“{{ permit.review_note }}”</span>{% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-{% if permit.document %}6{% else %}12{% endif %}">
+                    <div class="panel h-100">
+                        <div class="panel-head">
+                            <h2 class="panel-title"><i class="bi bi-cash-coin"></i> Fee</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="fee-box {% if permit.is_paid %}is-paid{% else %}is-unpaid{% endif %}">
+                                <div>
+                                    <div class="fee-amount">GHS {{ permit.fee_amount }}</div>
+                                    <small>
+                                        {% if permit.is_paid %}
+                                            Settled — nothing further to pay
+                                        {% else %}
+                                            Payable at the parking office
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <span class="badge text-bg-{% if permit.is_paid %}success{% else %}warning{% endif %}">
+                                    {% if permit.is_paid %}
+                                        <i class="bi bi-check2-circle me-1"></i>Paid
+                                    {% else %}
+                                        <i class="bi bi-exclamation-circle me-1"></i>Unpaid
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% if is_office_staff and not permit.is_paid and permit.status != 'rejected' %}
+                                <form method="post" action="{% url 'permits:review' permit.pk %}" class="mt-3">
+                                    {% csrf_token %}
+                                    <button name="action" value="mark_paid" class="btn btn-outline-primary btn-sm w-100">
+                                        <i class="bi bi-cash-coin me-1"></i>Record fee as paid
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if permit.document %}
+                    <div class="col-md-6">
+                        <div class="panel h-100">
+                            <div class="panel-head">
+                                <h2 class="panel-title"><i class="bi bi-paperclip"></i> Supporting document</h2>
+                            </div>
+                            <div class="panel-body">
+                                <a class="attach" href="{% url 'permits:document' permit.pk %}">
+                                    <span class="at-icon"><i class="bi bi-file-earmark-arrow-down"></i></span>
+                                    <span>
+                                        <span class="at-name">{{ permit.document.name|cut:"permits/"|slice:"8:" }}</span>
+                                        <span class="at-sub">Uploaded with the application</span>
+                                    </span>
+                                    <i class="bi bi-download at-arrow"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ---------------- Right: status, people, decision ---------------- #}
+        <div class="col-lg-4">
+            {% if permit.is_current %}
+                <div class="panel mb-3">
+                    <div class="panel-body">
+                        <div class="credential">
+                            <div class="cred-eyebrow">Valid permit — show at the gate</div>
+                            <div class="cred-number">{{ permit.permit_number }}</div>
+                            <div class="cred-rule"></div>
+                            <span class="cred-plate">{{ permit.vehicle.registration_number }}</span>
+                            <div class="cred-meta">
+                                {{ permit.zone_label }} · until {{ permit.valid_until|date:"j M Y" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if is_office_staff and permit.can_be_reviewed %}
+                <div class="panel mb-3">
+                    <div class="panel-head">
+                        <h2 class="panel-title"><i class="bi bi-clipboard-check"></i> Office review</h2>
+                        <span class="badge text-bg-warning">Action needed</span>
+                    </div>
+                    <div class="panel-body">
+                        <form method="post" action="{% url 'permits:review' permit.pk %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="{{ review_form.note.id_for_label }}" class="form-label">
+                                    {{ review_form.note.label }}
+                                </label>
+                                {{ review_form.note }}
+                                <div class="form-text">The applicant sees this in their alert and email.</div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button name="action" value="approve" class="btn btn-primary">
+                                    <i class="bi bi-check2-circle me-1"></i>Approve &amp; issue permit
+                                </button>
+                                <button name="action" value="reject" class="btn btn-outline-danger">
+                                    <i class="bi bi-x-circle me-1"></i>Reject application
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% elif is_office_staff and permit.can_be_revoked %}
+                <div class="panel mb-3">
+                    <div class="panel-head">
+                        <h2 class="panel-title"><i class="bi bi-slash-circle"></i> Revoke permit</h2>
+                    </div>
+                    <div class="panel-body">
+                        <form method="post" action="{% url 'permits:review' permit.pk %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="{{ review_form.note.id_for_label }}" class="form-label">Reason for revoking</label>
+                                {{ review_form.note }}
+                            </div>
+                            <button name="action" value="revoke" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-slash-circle me-1"></i>Revoke with immediate effect
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="panel mb-3">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-signpost-split"></i> Progress</h2>
+                </div>
+                <div class="panel-body">
+                    <ul class="stepper">
+                        {% for step in permit.timeline %}
+                            <li class="{{ step.state }}">
+                                <span class="st-dot"><i class="bi {{ step.icon }}"></i></span>
+                                <span class="st-label">{{ step.label }}</span>
+                                <span class="st-when">{{ step.when|default:"Pending" }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            {% if is_office_staff %}
+                <div class="panel mb-3">
+                    <div class="panel-head">
+                        <h2 class="panel-title"><i class="bi bi-person-circle"></i> Applicant</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="person-card">
+                            <span class="person-avatar">{{ permit.holder.username|slice:":1"|upper }}</span>
+                            <div>
+                                <div class="person-name">{{ permit.holder.get_full_name|default:permit.holder.username }}</div>
+                                <span class="badge rounded-pill badge-role-{{ permit.holder.role }}">{{ permit.holder.get_role_display }}</span>
+                            </div>
+                        </div>
+                        <ul class="person-contact">
+                            <li><i class="bi bi-at"></i>
+                                {% if permit.holder.email %}{{ permit.holder.email }}
+                                {% else %}<span class="is-blank">No email on file</span>{% endif %}
+                            </li>
+                            <li><i class="bi bi-telephone"></i>
+                                {% if permit.holder.phone_number %}{{ permit.holder.phone_number }}
+                                {% else %}<span class="is-blank">No phone on file</span>{% endif %}
+                            </li>
+                            <li><i class="bi bi-car-front"></i>
+                                {{ permit.holder.vehicles.count }} vehicle{{ permit.holder.vehicles.count|pluralize }} registered
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            {% else %}
+                <div class="panel mb-3">
+                    <div class="panel-head">
+                        <h2 class="panel-title"><i class="bi bi-question-circle"></i> What happens next</h2>
+                    </div>
+                    <div class="panel-body">
+                        <p class="text-muted small mb-0">
+                            {% if permit.status == 'pending' %}
+                                The parking office reviews applications in the order they arrive. You'll get
+                                an alert here and an email as soon as a decision is made — no need to chase it.
+                            {% elif permit.is_current %}
+                                Your permit is active. Show the number above if security asks, and apply
+                                again before {{ permit.valid_until|date:"j M Y" }} to avoid a gap in cover.
+                            {% elif permit.status == 'rejected' %}
+                                You can correct the details and apply again at any time, or contact the
+                                parking office if you think this was a mistake.
+                            {% elif permit.status == 'expired' %}
+                                This permit has run its course. Apply for a new one to keep parking on campus.
+                            {% else %}
+                                Contact the parking office if you need to discuss this permit.
+                            {% endif %}
+                        </p>
+                        {% if permit.status == 'rejected' or permit.status == 'expired' %}
+                            <a class="btn btn-primary btn-sm w-100 mt-3" href="{% url 'permits:apply' %}">
+                                <i class="bi bi-plus-lg me-1"></i>Apply again
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if permit.can_be_withdrawn and not is_office_staff %}
+                <a class="btn btn-outline-danger btn-sm w-100" href="{% url 'permits:withdraw' permit.pk %}">
+                    <i class="bi bi-x-circle me-1"></i>Withdraw this application
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

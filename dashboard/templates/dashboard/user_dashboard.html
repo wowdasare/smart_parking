@@ -3,76 +3,326 @@
 {% block title %}Dashboard — ATU Smart Parking{% endblock %}
 
 {% block content %}
-    <h1 class="h3 mb-1">Welcome, {{ user.get_full_name|default:user.username }}</h1>
-    <p class="text-muted mb-4">Here's a quick look at your parking account.</p>
+    <div class="dash-head">
+        <div class="dash-head-text">
+            <h1>Welcome back, {{ user.get_full_name|default:user.username }}</h1>
+            <p>
+                <span class="badge rounded-pill badge-role-{{ user.role }}">{{ user.get_role_display }}</span>
+                <span class="ms-2">{% now "l, j F Y" %}</span>
+            </p>
+        </div>
+        <div class="dash-head-actions">
+            <a class="btn btn-ghost btn-sm" href="{% url 'vehicles:list' %}">
+                <i class="bi bi-car-front me-1"></i>My vehicles
+            </a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'parking:zone_list' %}">
+                <i class="bi bi-p-square me-1"></i>Find a space
+            </a>
+            <a class="btn btn-accent btn-sm" href="{% url 'reservations:create' %}">
+                <i class="bi bi-calendar-plus me-1"></i>Book a slot
+            </a>
+        </div>
+    </div>
 
     <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-blue"><i class="bi bi-car-front"></i></span>
-                <div>
-                    <div class="stat-value">{{ vehicle_count }}</div>
-                    <div class="stat-label">My Vehicles</div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--green">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">My bookings</div>
+                        <div class="kpi-value">{{ live_bookings }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-calendar-check"></i></span>
                 </div>
+                <div class="kpi-foot"><i class="bi bi-clock"></i>Confirmed or in progress</div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-gold"><i class="bi bi-calendar-check"></i></span>
-                <div>
-                    <div class="stat-value">—</div>
-                    <div class="stat-label">Active Reservations</div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--primary">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">My vehicles</div>
+                        <div class="kpi-value">{{ vehicle_count }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-car-front"></i></span>
                 </div>
+                <div class="kpi-foot"><i class="bi bi-shield-check"></i>Registered to your account</div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-green"><i class="bi bi-p-square"></i></span>
-                <div>
-                    <div class="stat-value">{{ available_slots }}</div>
-                    <div class="stat-label">Slots Available Now</div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi {% if totals.free %}kpi--slate{% else %}kpi--red{% endif %}">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Spaces free now</div>
+                        <div class="kpi-value">{{ totals.free }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-p-circle"></i></span>
                 </div>
+                <div class="kpi-foot"><i class="bi bi-broadcast"></i>Live from gate counters</div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="stat-tile">
-                <span class="stat-icon bg-red"><i class="bi bi-bell"></i></span>
-                <div>
-                    <div class="stat-value">—</div>
-                    <div class="stat-label">Unread Notifications</div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--accent">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Zones open</div>
+                        <div class="kpi-value">{{ totals.zones_open }}<small>/{{ totals.zone_count }}</small></div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-signpost-split"></i></span>
+                </div>
+                <div class="kpi-foot"><i class="bi bi-graph-up"></i>Campus is {{ totals.percent }}% full</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+            <div class="kpi kpi--red">
+                <div class="kpi-top">
+                    <div>
+                        <div class="kpi-label">Unread alerts</div>
+                        <div class="kpi-value">{{ unread_notifications }}</div>
+                    </div>
+                    <span class="kpi-icon"><i class="bi bi-bell"></i></span>
+                </div>
+                <div class="kpi-foot"><i class="bi bi-envelope"></i>Also sent to your email</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-calendar-check"></i> My upcoming bookings</h2>
+                    <a class="btn btn-primary btn-sm" href="{% url 'reservations:create' %}">
+                        <i class="bi bi-plus-lg me-1"></i>Book a slot
+                    </a>
+                </div>
+                <div class="panel-body is-flush">
+                    {% if upcoming_bookings %}
+                        <div class="table-responsive">
+                            <table class="table-clean">
+                                <thead>
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Slot</th>
+                                    <th>Vehicle</th>
+                                    <th>Window</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for r in upcoming_bookings %}
+                                    <tr>
+                                        <td><code>{{ r.reference }}</code></td>
+                                        <td>
+                                            <span class="cell-strong d-block">{{ r.slot }}</span>
+                                            <span class="cell-muted">{{ r.zone.name }}</span>
+                                        </td>
+                                        <td>{{ r.vehicle.registration_number }}</td>
+                                        <td class="cell-muted">{{ r.start_time|date:"j M, H:i" }} &rarr; {{ r.end_time|date:"H:i" }}</td>
+                                        <td>
+                                            <span class="badge text-bg-{{ r.status_tone }}">{{ r.get_status_display }}</span>
+                                            {% if r.is_current %}<div class="cell-muted">In progress</div>{% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a class="btn btn-outline-primary btn-sm" href="{% url 'reservations:detail' r.pk %}">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="panel-empty">
+                            <i class="bi bi-calendar-plus"></i>
+                            <p class="mb-3">You have no upcoming bookings.</p>
+                            <a class="btn btn-primary btn-sm" href="{% url 'reservations:create' %}">Book a parking slot</a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="row g-3 mb-4">
+        <div class="col-lg-7">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-car-front"></i> My vehicles</h2>
+                    <a class="btn btn-outline-primary btn-sm" href="{% url 'vehicles:add' %}">
+                        <i class="bi bi-plus-lg me-1"></i>Add vehicle
+                    </a>
+                </div>
+                <div class="panel-body is-flush">
+                    {% if vehicles %}
+                        <div class="table-responsive">
+                            <table class="table-clean">
+                                <thead>
+                                <tr>
+                                    <th>Registration</th>
+                                    <th>Vehicle</th>
+                                    <th>Type</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for vehicle in vehicles %}
+                                    <tr>
+                                        <td class="cell-strong">{{ vehicle.registration_number }}</td>
+                                        <td>
+                                            {{ vehicle.make }} {{ vehicle.model }}
+                                            {% if vehicle.color %}<div class="cell-muted">{{ vehicle.color }}</div>{% endif %}
+                                        </td>
+                                        <td><span class="badge text-bg-light">{{ vehicle.get_vehicle_type_display }}</span></td>
+                                        <td class="text-end">
+                                            <a class="btn btn-outline-primary btn-sm" href="{% url 'vehicles:edit' vehicle.pk %}">Edit</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="panel-empty">
+                            <i class="bi bi-car-front"></i>
+                            <p class="mb-3">You haven't registered a vehicle yet.</p>
+                            <a class="btn btn-primary btn-sm" href="{% url 'vehicles:add' %}">Register your first vehicle</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="d-flex flex-column gap-3 h-100">
+                <div class="panel">
+                    <div class="panel-head">
+                        <h2 class="panel-title"><i class="bi bi-patch-check"></i> My parking permit</h2>
+                        <a class="small" href="{% url 'permits:list' %}">All permits</a>
+                    </div>
+                    <div class="panel-body">
+                        {% if current_permit %}
+                            <div class="text-center">
+                                <span class="badge text-bg-success mb-2">Valid permit</span>
+                                <div class="fw-semibold fs-5"><code>{{ current_permit.permit_number }}</code></div>
+                                <div class="text-muted small mb-2">
+                                    {{ current_permit.vehicle.registration_number }} · {{ current_permit.zone_label }}
+                                </div>
+                                <div class="occ-bar mb-2">
+                                    <span style="width: 100%; background: #1e8a5f;"></span>
+                                </div>
+                                <div class="text-muted small">
+                                    Expires {{ current_permit.valid_until|date:"j M Y" }}
+                                    — {{ current_permit.days_remaining }} day{{ current_permit.days_remaining|pluralize }} left
+                                </div>
+                                {% if not current_permit.is_paid %}
+                                    <div class="alert alert-warning py-2 small mt-3 mb-0">
+                                        Fee of GHS {{ current_permit.fee_amount }} still payable at the parking office.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% elif permit_pending %}
+                            <div class="panel-empty">
+                                <i class="bi bi-hourglass-split"></i>
+                                <p class="mb-2">Your permit application is with the parking office.</p>
+                                <a class="btn btn-outline-primary btn-sm" href="{% url 'permits:list' %}">Track it</a>
+                            </div>
+                        {% else %}
+                            <div class="panel-empty">
+                                <i class="bi bi-patch-question"></i>
+                                <p class="mb-3">You don't have a parking permit yet.</p>
+                                <a class="btn btn-primary btn-sm" href="{% url 'permits:apply' %}">Apply for one</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% include 'dashboard/partials/_occupancy_panel.html' %}
+            </div>
+        </div>
+    </div>
+
     <div class="row g-3">
-        <div class="col-md-4">
-            <div class="card card-hover h-100">
-                <div class="card-body">
-                    <div class="feature-icon"><i class="bi bi-car-front"></i></div>
-                    <h5 class="card-title">My Vehicles</h5>
-                    <p class="card-text text-muted">Manage your registered vehicles.</p>
-                    <a href="{% url 'vehicles:list' %}" class="btn btn-outline-primary btn-sm">View</a>
+        <div class="col-lg-5">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-lightning-charge"></i> Quick actions</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="d-flex flex-column gap-2">
+                        <a class="quick-action" href="{% url 'reservations:create' %}">
+                            <span class="qa-icon"><i class="bi bi-calendar-plus"></i></span>
+                            <span>
+                                <span class="qa-title">Book a parking slot</span>
+                                <span class="qa-sub">Reserve a bay and get a gate reference</span>
+                            </span>
+                            <i class="bi bi-chevron-right qa-arrow"></i>
+                        </a>
+                        <a class="quick-action" href="{% url 'parking:zone_list' %}">
+                            <span class="qa-icon"><i class="bi bi-p-square"></i></span>
+                            <span>
+                                <span class="qa-title">Check live availability</span>
+                                <span class="qa-sub">See free spaces per zone before you drive in</span>
+                            </span>
+                            <i class="bi bi-chevron-right qa-arrow"></i>
+                        </a>
+                        <a class="quick-action" href="{% url 'vehicles:list' %}">
+                            <span class="qa-icon"><i class="bi bi-car-front"></i></span>
+                            <span>
+                                <span class="qa-title">Manage my vehicles</span>
+                                <span class="qa-sub">Add, edit, or remove a registered vehicle</span>
+                            </span>
+                            <i class="bi bi-chevron-right qa-arrow"></i>
+                        </a>
+                        <a class="quick-action" href="{% url 'permits:list' %}">
+                            <span class="qa-icon"><i class="bi bi-patch-check"></i></span>
+                            <span>
+                                <span class="qa-title">My parking permit</span>
+                                <span class="qa-sub">Apply for or track a campus permit</span>
+                            </span>
+                            <i class="bi bi-chevron-right qa-arrow"></i>
+                        </a>
+                        <a class="quick-action" href="{% url 'accounts:profile' %}">
+                            <span class="qa-icon"><i class="bi bi-person-circle"></i></span>
+                            <span>
+                                <span class="qa-title">Update my profile</span>
+                                <span class="qa-sub">Keep your contact details current</span>
+                            </span>
+                            <i class="bi bi-chevron-right qa-arrow"></i>
+                        </a>
+                        <a class="quick-action" href="{% url 'notifications:list' %}">
+                            <span class="qa-icon"><i class="bi bi-bell"></i></span>
+                            <span>
+                                <span class="qa-title">My notifications</span>
+                                <span class="qa-sub">{{ unread_notifications }} unread</span>
+                            </span>
+                            <i class="bi bi-chevron-right qa-arrow"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card card-hover h-100">
-                <div class="card-body">
-                    <div class="feature-icon"><i class="bi bi-calendar-check"></i></div>
-                    <h5 class="card-title">My Reservations</h5>
-                    <p class="card-text text-muted">Track your parking bookings.</p>
-                    <a href="{% url 'reservations:list' %}" class="btn btn-outline-primary btn-sm">View</a>
+        <div class="col-lg-7">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-bell"></i> Recent alerts</h2>
+                    <a class="small" href="{% url 'notifications:list' %}">View all</a>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card card-hover h-100">
-                <div class="card-body">
-                    <div class="feature-icon"><i class="bi bi-p-square"></i></div>
-                    <h5 class="card-title">Parking Zones</h5>
-                    <p class="card-text text-muted">Check real-time slot availability.</p>
-                    <a href="{% url 'parking:zone_list' %}" class="btn btn-outline-primary btn-sm">View</a>
+                <div class="panel-body">
+                    {% if recent_notifications %}
+                        <ul class="timeline">
+                            {% for note in recent_notifications %}
+                                <li class="{% if note.is_read %}tl-muted{% else %}tl-blue{% endif %}">
+                                    <span class="tl-text">{{ note.message }}</span>
+                                    <span class="tl-time">{{ note.get_category_display }} · {{ note.created_at|date:"j M, H:i" }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="panel-empty">
+                            <i class="bi bi-bell-slash"></i>
+                            <p>No alerts yet. Booking confirmations and status
+                                updates will appear here once reservations go live.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

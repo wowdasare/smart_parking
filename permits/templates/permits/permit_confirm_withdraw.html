@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Withdraw application — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="auth-card text-center">
+                <div class="auth-icon mx-auto"><i class="bi bi-x-circle"></i></div>
+                <h1 class="h4 mb-3">Withdraw this application?</h1>
+                <p class="text-muted">
+                    {{ permit.get_permit_type_display }} for {{ permit.vehicle.registration_number }},
+                    {{ permit.valid_from|date:"j M Y" }} to {{ permit.valid_until|date:"j M Y" }}.
+                    You can apply again at any time.
+                </p>
+                <form method="post" class="d-flex gap-2 justify-content-center mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, withdraw it</button>
+                    <a href="{% url 'permits:detail' permit.pk %}" class="btn btn-outline-secondary">Keep it</a>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

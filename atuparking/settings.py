@@ -34,6 +34,31 @@ DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
+# In local development, also accept requests that arrive by the machine's LAN
+# IP address — e.g. a phone on the same WiFi opening the sensor simulator by
+# the laptop's IP. DEBUG-only; production still honours the explicit list above.
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+
+# Demoing from a phone means tunnelling the dev server through a public HTTPS
+# hostname (ngrok / Cloudflare), and that hostname is a different origin from
+# the one the form was served by as far as Django is concerned. Since Django
+# 4.0 every POST carries an Origin header that is checked against this list,
+# so without these entries logging in, booking a slot or applying for a permit
+# over a tunnel fails with "CSRF verification failed. Origin checking failed".
+# ALLOWED_HOSTS above is not enough on its own — that check is separate.
+#
+# DEBUG-only: a real deployment should list its own domain explicitly instead.
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS += [
+        'https://*.ngrok-free.app',
+        'https://*.ngrok-free.dev',
+        'https://*.ngrok.io',
+        'https://*.ngrok.app',
+        'https://*.trycloudflare.com',
+    ]
+
 
 # Application definition
 
@@ -96,6 +121,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # Feeds the navbar's unread-alert badge on every page.
+                'notifications.context_processors.unread_count',
             ],
         },
     },

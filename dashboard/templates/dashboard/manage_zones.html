@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Zones &amp; Slots — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <div class="page-head">
+        <div>
+            <h1 class="page-title"><i class="bi bi-p-square"></i> Zones &amp; slots</h1>
+            <p class="page-sub">
+                {{ totals.zone_count }} zone{{ totals.zone_count|pluralize }} ·
+                {{ slots.total }} sensor slot{{ slots.total|pluralize }} ·
+                {{ totals.occupancy }} of {{ totals.capacity }} spaces in use
+            </p>
+        </div>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'dashboard:home' %}">
+            <i class="bi bi-arrow-left me-1"></i>Back to dashboard
+        </a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-7">{% include 'dashboard/partials/_occupancy_panel.html' %}</div>
+        <div class="col-lg-5">{% include 'dashboard/partials/_slot_mix_panel.html' %}</div>
+    </div>
+
+    <div class="panel mb-4">
+        <div class="panel-head">
+            <h2 class="panel-title"><i class="bi bi-grid-3x3-gap"></i> Slots by zone</h2>
+            <span class="small text-muted">Live status from slot sensors</span>
+        </div>
+        <div class="panel-body">
+            {% for row in zone_rows %}
+                <div class="{% if not forloop.last %}mb-4 pb-3 border-bottom{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <div>
+                            <span class="fw-semibold">{{ row.zone.name }}</span>
+                            <span class="text-muted small ms-2">Zone {{ row.zone.code }}</span>
+                        </div>
+                        <span class="small text-muted">
+                            {% if row.capacity %}{{ row.occupancy }}/{{ row.capacity }} counted{% else %}{{ row.occupancy }} counted{% endif %}
+                        </span>
+                    </div>
+                    {% if row.slots %}
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for slot in row.slots %}
+                                <span class="slot-chip is-{{ slot.status }}"
+                                      title="{{ slot }} — {{ slot.get_status_display }}{% if slot.manual_override_at %} (manual override){% endif %}">
+                                    {{ slot.slot_number }}
+                                    {% if slot.manual_override_at %}<i class="bi bi-hand-index-thumb"></i>{% endif %}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">
+                            No individual slots configured — this zone is gate-counted only.
+                        </p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="panel-empty">
+                    <i class="bi bi-p-square"></i>
+                    <p>No parking zones configured yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">{% include 'dashboard/partials/_activity_panel.html' %}</div>
+        <div class="col-lg-6">{% include 'dashboard/partials/_device_panel.html' %}</div>
+    </div>
+{% endblock %}

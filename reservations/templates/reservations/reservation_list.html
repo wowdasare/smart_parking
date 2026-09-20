@@ -1,11 +1,147 @@
 {% extends 'base.html' %}
 
-{% block title %}My Reservations — ATU Smart Parking{% endblock %}
+{% block title %}{% if is_gate_staff %}All Bookings{% else %}My Reservations{% endif %} — ATU Smart Parking{% endblock %}
 
 {% block content %}
-    <h1 class="h3 mb-4">My Reservations</h1>
-    <div class="alert alert-secondary">
-        Parking slot booking and reservation history are coming soon. This page will show your
-        requested, confirmed, and cancelled reservations.
+    <div class="page-head">
+        <div>
+            <h1 class="page-title">
+                <i class="bi bi-calendar-check"></i>
+                {% if is_gate_staff %}All bookings{% else %}My reservations{% endif %}
+            </h1>
+            <p class="page-sub">
+                {% if is_gate_staff %}
+                    Every booking on the platform, newest window first.
+                {% else %}
+                    Your parking bookings, past and upcoming.
+                {% endif %}
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if is_gate_staff %}
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'reservations:gate_verify' %}">
+                    <i class="bi bi-qr-code-scan me-1"></i>Gate verification
+                </a>
+            {% endif %}
+            <a class="btn btn-primary btn-sm" href="{% url 'reservations:create' %}">
+                <i class="bi bi-plus-lg me-1"></i>Book a slot
+            </a>
+        </div>
+    </div>
+
+    {% if not can_book and not is_gate_staff %}
+        <div class="alert alert-warning d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <div>
+                You need a registered vehicle before you can book a slot.
+                <a href="{% url 'vehicles:add' %}" class="alert-link">Add your vehicle</a>.
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="panel mb-4">
+        <div class="panel-head">
+            <h2 class="panel-title"><i class="bi bi-clock"></i> Current &amp; upcoming</h2>
+            <span class="small text-muted">{{ upcoming|length }} booking{{ upcoming|length|pluralize }}</span>
+        </div>
+        <div class="panel-body is-flush">
+            {% if upcoming %}
+                <div class="table-responsive">
+                    <table class="table-clean">
+                        <thead>
+                        <tr>
+                            <th>Reference</th>
+                            {% if is_gate_staff %}<th>Booked by</th>{% endif %}
+                            <th>Slot</th>
+                            <th>Vehicle</th>
+                            <th>Window</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for r in upcoming %}
+                            <tr>
+                                <td class="cell-strong"><code>{{ r.reference }}</code></td>
+                                {% if is_gate_staff %}
+                                    <td>{{ r.user.get_full_name|default:r.user.username }}</td>
+                                {% endif %}
+                                <td>
+                                    <span class="cell-strong d-block">{{ r.slot }}</span>
+                                    <span class="cell-muted">{{ r.zone.name }}</span>
+                                </td>
+                                <td>{{ r.vehicle.registration_number }}</td>
+                                <td>
+                                    <span class="d-block">{{ r.start_time|date:"j M, H:i" }} &rarr; {{ r.end_time|date:"H:i" }}</span>
+                                    <span class="cell-muted">{{ r.duration_hours }} hour{{ r.duration_hours|pluralize }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge text-bg-{{ r.status_tone }}">{{ r.get_status_display }}</span>
+                                    {% if r.is_current %}<div class="cell-muted">In progress</div>{% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a class="btn btn-outline-primary btn-sm" href="{% url 'reservations:detail' r.pk %}">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="panel-empty">
+                    <i class="bi bi-calendar-plus"></i>
+                    <p class="mb-3">No current or upcoming bookings.</p>
+                    {% if can_book %}
+                        <a class="btn btn-primary btn-sm" href="{% url 'reservations:create' %}">Book a slot</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h2 class="panel-title"><i class="bi bi-archive"></i> History</h2>
+            <span class="small text-muted">{{ history|length }} record{{ history|length|pluralize }}</span>
+        </div>
+        <div class="panel-body is-flush">
+            {% if history %}
+                <div class="table-responsive">
+                    <table class="table-clean">
+                        <thead>
+                        <tr>
+                            <th>Reference</th>
+                            {% if is_gate_staff %}<th>Booked by</th>{% endif %}
+                            <th>Slot</th>
+                            <th>Window</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for r in history %}
+                            <tr>
+                                <td><code>{{ r.reference }}</code></td>
+                                {% if is_gate_staff %}
+                                    <td class="cell-muted">{{ r.user.get_full_name|default:r.user.username }}</td>
+                                {% endif %}
+                                <td class="cell-muted">{{ r.slot }}</td>
+                                <td class="cell-muted">{{ r.start_time|date:"j M Y, H:i" }}</td>
+                                <td><span class="badge text-bg-{{ r.status_tone }}">{{ r.get_status_display }}</span></td>
+                                <td class="text-end">
+                                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'reservations:detail' r.pk %}">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="panel-empty">
+                    <i class="bi bi-archive"></i>
+                    <p>Nothing in your booking history yet.</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

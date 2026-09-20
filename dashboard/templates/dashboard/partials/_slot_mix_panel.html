@@ -1,0 +1,26 @@
+{# Expects: slots (from _slot_breakdown) #}
+<div class="panel">
+    <div class="panel-head">
+        <h2 class="panel-title"><i class="bi bi-grid-3x3-gap"></i> Slot status mix</h2>
+        <span class="small text-muted">{{ slots.total }} sensor slot{{ slots.total|pluralize }}</span>
+    </div>
+    <div class="panel-body">
+        {% if slots.total %}
+            <div class="seg-bar">
+                <span class="seg-available" style="width: {{ slots.available_pct }}%"></span>
+                <span class="seg-occupied" style="width: {{ slots.occupied_pct }}%"></span>
+                <span class="seg-reserved" style="width: {{ slots.reserved_pct }}%"></span>
+            </div>
+            <div class="seg-legend">
+                <span><span class="sw seg-available"></span>Available<span class="sw-count">{{ slots.available }}</span></span>
+                <span><span class="sw seg-occupied"></span>Occupied<span class="sw-count">{{ slots.occupied }}</span></span>
+                <span><span class="sw seg-reserved"></span>Reserved<span class="sw-count">{{ slots.reserved }}</span></span>
+            </div>
+        {% else %}
+            <div class="panel-empty">
+                <i class="bi bi-grid-3x3-gap"></i>
+                <p>No individual slots configured yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>

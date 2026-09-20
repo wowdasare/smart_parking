@@ -1,10 +1,152 @@
 {% extends 'base.html' %}
 
-{% block title %}Parking Permits — ATU Smart Parking{% endblock %}
+{% block title %}{% if is_office_staff %}Permit Applications{% else %}My Permits{% endif %} — ATU Smart Parking{% endblock %}
 
 {% block content %}
-    <h1 class="h3 mb-4">Parking Permits</h1>
-    <div class="alert alert-secondary">
-        Digital parking permit verification is coming soon.
+    <div class="page-head">
+        <div>
+            <h1 class="page-title">
+                <i class="bi bi-patch-check"></i>
+                {% if is_office_staff %}Permit applications{% else %}My parking permits{% endif %}
+            </h1>
+            <p class="page-sub">
+                {% if is_office_staff %}
+                    {{ pending_count }} awaiting review · {{ active_count }} currently valid
+                {% else %}
+                    A permit is your standing right to park on campus. Bookings reserve a specific bay.
+                {% endif %}
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if is_office_staff %}
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'permits:plate_check' %}">
+                    <i class="bi bi-upc-scan me-1"></i>Plate check
+                </a>
+            {% endif %}
+            <a class="btn btn-primary btn-sm" href="{% url 'permits:apply' %}">
+                <i class="bi bi-plus-lg me-1"></i>Apply for a permit
+            </a>
+        </div>
+    </div>
+
+    {% if not can_apply and not is_office_staff %}
+        <div class="alert alert-warning d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <div>
+                You need a registered vehicle before you can apply for a permit.
+                <a href="{% url 'vehicles:add' %}" class="alert-link">Add your vehicle</a>.
+            </div>
+        </div>
+    {% endif %}
+
+    {% if is_office_staff %}
+        <div class="panel mb-3">
+            <div class="panel-body">
+                <form method="get" class="filter-bar">
+                    <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm"
+                           placeholder="Search permit number, plate, or holder">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All statuses</option>
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    {% if query or status %}
+                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'permits:list' %}">Clear</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="panel">
+        <div class="panel-head">
+            <h2 class="panel-title"><i class="bi bi-list-check"></i> Permits</h2>
+            <span class="small text-muted">{{ permits|length }} record{{ permits|length|pluralize }}</span>
+        </div>
+        <div class="panel-body is-flush">
+            {% if permits %}
+                <div class="table-responsive">
+                    <table class="table-clean">
+                        <thead>
+                        <tr>
+                            <th>Permit</th>
+                            {% if is_office_staff %}<th>Holder</th>{% endif %}
+                            <th>Vehicle</th>
+                            <th>Type</th>
+                            <th>Valid</th>
+                            <th>Fee</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for permit in permits %}
+                            <tr>
+                                <td class="cell-strong">
+                                    {% if permit.permit_number %}
+                                        <code>{{ permit.permit_number }}</code>
+                                    {% else %}
+                                        <span class="cell-muted">Not yet issued</span>
+                                    {% endif %}
+                                </td>
+                                {% if is_office_staff %}
+                                    <td>
+                                        <span class="cell-strong d-block">{{ permit.holder.get_full_name|default:permit.holder.username }}</span>
+                                        <span class="badge rounded-pill badge-role-{{ permit.holder.role }}">{{ permit.holder.get_role_display }}</span>
+                                    </td>
+                                {% endif %}
+                                <td>{{ permit.vehicle.registration_number }}</td>
+                                <td>
+                                    <span class="d-block">{{ permit.get_permit_type_display }}</span>
+                                    <span class="cell-muted">{{ permit.zone_label }}</span>
+                                </td>
+                                <td>
+                                    <span class="d-block">{{ permit.valid_from|date:"j M Y" }} &rarr; {{ permit.valid_until|date:"j M Y" }}</span>
+                                    {% if permit.is_current %}
+                                        <span class="cell-muted">{{ permit.days_remaining }} day{{ permit.days_remaining|pluralize }} left</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    GHS {{ permit.fee_amount }}
+                                    {% if permit.is_paid %}
+                                        <div><span class="status-dot is-on"></span><span class="cell-muted">Paid</span></div>
+                                    {% else %}
+                                        <div><span class="status-dot is-idle"></span><span class="cell-muted">Unpaid</span></div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge text-bg-{{ permit.status_tone }}">{{ permit.get_status_display }}</span>
+                                    {% if permit.expires_soon %}
+                                        <div class="cell-muted text-warning">Expiring soon</div>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a class="btn btn-outline-primary btn-sm" href="{% url 'permits:detail' permit.pk %}">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="panel-empty">
+                    <i class="bi bi-patch-question"></i>
+                    <p class="mb-3">
+                        {% if query or status %}
+                            No permits match those filters.
+                        {% elif is_office_staff %}
+                            No permit applications have been submitted yet.
+                        {% else %}
+                            You don't have a parking permit yet.
+                        {% endif %}
+                    </p>
+                    {% if can_apply and not query and not status %}
+                        <a class="btn btn-primary btn-sm" href="{% url 'permits:apply' %}">Apply for a permit</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

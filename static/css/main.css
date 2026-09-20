@@ -193,6 +193,81 @@ h1, h2, h3, h4, h5, h6,
     color: #fff;
 }
 
+/* Hero with auto-sliding campus photo background (Bootstrap carousel).
+   The gradient overlay lives on each slide so it crossfades with the photo,
+   keeping the white hero text readable over the bright daytime shots. */
+
+.hero.hero-slider {
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    background: var(--atu-primary-dark); /* fallback while photos load */
+}
+
+.hero-slider .hero-bg {
+    position: absolute;
+    inset: 0;
+}
+
+.hero-slider .hero-bg .carousel-inner,
+.hero-slider .hero-bg .carousel-item {
+    height: 100%;
+}
+
+.hero-slider .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-slider .carousel-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg,
+        rgba(7, 40, 68, 0.94) 0%,
+        rgba(7, 40, 68, 0.8) 45%,
+        rgba(11, 61, 99, 0.38) 100%);
+}
+
+.hero-slider .carousel-indicators {
+    z-index: 3;
+    margin-bottom: 0.75rem;
+}
+
+.hero-slider .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 3.5rem 3rem 4rem;
+}
+
+@media (max-width: 767.98px) {
+    .hero-slider .hero-content {
+        padding: 2.5rem 1.5rem 3.5rem;
+    }
+}
+
+.hero-crest {
+    position: absolute;
+    z-index: 2;
+    right: 3.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 170px;
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.35));
+}
+
+/* ATU crest in the navbar/footer — white circle so the navy crest reads on
+   the dark background. */
+.brand-crest {
+    width: 34px;
+    height: 34px;
+    background: #fff;
+    border-radius: 50%;
+    padding: 3px;
+    object-fit: contain;
+}
+
 .feature-icon {
     width: 3rem;
     height: 3rem;
@@ -291,4 +366,1423 @@ h1, h2, h3, h4, h5, h6,
 
 footer.bg-dark {
     background-color: var(--atu-primary-dark) !important;
+}
+
+/* ============================================================
+   Dashboard components
+   Everything below reads from the :root variables at the top of
+   this file, so re-theming the platform stays a one-place edit.
+   ============================================================ */
+
+/* ---------- Dashboard header banner ---------- */
+
+.dash-head {
+    background: linear-gradient(135deg, var(--atu-primary) 0%, var(--atu-primary-dark) 100%);
+    color: #fff;
+    border-radius: var(--atu-radius-lg);
+    box-shadow: var(--atu-shadow);
+    padding: 1.6rem 1.75rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.dash-head::after {
+    content: '';
+    position: absolute;
+    right: -3.5rem;
+    top: -4rem;
+    width: 13rem;
+    height: 13rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.dash-head-text, .dash-head-actions {
+    position: relative;
+    z-index: 1;
+}
+
+.dash-head h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.dash-head p {
+    margin: 0.35rem 0 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.92rem;
+}
+
+.dash-head-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.dash-head .btn-ghost {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: #fff;
+}
+
+.dash-head .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.24);
+    color: #fff;
+}
+
+/* ---------- Page header (list / management screens) ---------- */
+
+.page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.page-head .page-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.page-head .page-title i {
+    color: var(--atu-primary);
+}
+
+.page-head .page-sub {
+    color: var(--atu-text-muted);
+    margin: 0.35rem 0 0;
+}
+
+/* ---------- KPI cards ---------- */
+
+.kpi {
+    background: var(--atu-surface);
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius);
+    box-shadow: var(--atu-shadow-sm);
+    padding: 1.25rem 1.35rem;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    --kpi-color: var(--atu-primary);
+    --kpi-soft: rgba(11, 61, 99, 0.1);
+}
+
+.kpi:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--atu-shadow);
+}
+
+.kpi::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--kpi-color);
+}
+
+.kpi--primary { --kpi-color: var(--atu-primary); --kpi-soft: rgba(11, 61, 99, 0.1); }
+.kpi--accent  { --kpi-color: var(--atu-accent);  --kpi-soft: rgba(242, 169, 0, 0.18); }
+.kpi--green   { --kpi-color: #1e8a5f;            --kpi-soft: rgba(30, 138, 95, 0.13); }
+.kpi--red     { --kpi-color: #c8433d;            --kpi-soft: rgba(200, 67, 61, 0.13); }
+.kpi--slate   { --kpi-color: #5a6b7d;            --kpi-soft: rgba(90, 107, 125, 0.13); }
+
+.kpi-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.kpi-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    background: var(--kpi-soft);
+    color: var(--kpi-color);
+    flex-shrink: 0;
+}
+
+.kpi-label {
+    color: var(--atu-text-muted);
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.kpi-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.kpi-value small {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--atu-text-muted);
+}
+
+.kpi-foot {
+    margin-top: 0.65rem;
+    font-size: 0.8rem;
+    color: var(--atu-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* ---------- Panels ---------- */
+
+.panel {
+    background: var(--atu-surface);
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius);
+    box-shadow: var(--atu-shadow-sm);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--atu-border);
+}
+
+.panel-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.panel-title i {
+    color: var(--atu-primary);
+}
+
+.panel-body {
+    padding: 1.25rem;
+    flex: 1;
+}
+
+.panel-body.is-flush {
+    padding: 0;
+}
+
+.panel-foot {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--atu-border);
+    background: rgba(11, 61, 99, 0.02);
+}
+
+/* ---------- Clean data tables ---------- */
+
+.table-clean {
+    margin: 0;
+    width: 100%;
+}
+
+.table-clean thead th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    color: var(--atu-text-muted);
+    background: rgba(11, 61, 99, 0.03);
+    border-bottom: 1px solid var(--atu-border);
+    padding: 0.7rem 1.25rem;
+    white-space: nowrap;
+}
+
+.table-clean tbody td {
+    padding: 0.8rem 1.25rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--atu-border);
+}
+
+.table-clean tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.table-clean tbody tr:hover {
+    background: rgba(11, 61, 99, 0.025);
+}
+
+.table-clean .cell-strong {
+    font-weight: 500;
+}
+
+.table-clean .cell-muted {
+    color: var(--atu-text-muted);
+    font-size: 0.85rem;
+}
+
+/* ---------- Zone occupancy rows ---------- */
+
+.occ-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.4rem 1rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px dashed var(--atu-border);
+}
+
+.occ-row:first-child { padding-top: 0; }
+.occ-row:last-child { border-bottom: 0; padding-bottom: 0; }
+
+.occ-name { font-weight: 500; }
+.occ-name .occ-code {
+    color: var(--atu-text-muted);
+    font-weight: 400;
+    font-size: 0.85rem;
+    margin-left: 0.35rem;
+}
+
+.occ-count {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.occ-count small {
+    font-weight: 400;
+    color: var(--atu-text-muted);
+}
+
+.occ-bar {
+    grid-column: 1 / -1;
+    height: 8px;
+    border-radius: 99px;
+    background: rgba(11, 61, 99, 0.08);
+    overflow: hidden;
+}
+
+.occ-bar span {
+    display: block;
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+}
+
+.occ-row.occ-low .occ-bar span  { background: #1e8a5f; }
+.occ-row.occ-mid .occ-bar span  { background: var(--atu-accent); }
+.occ-row.occ-high .occ-bar span { background: #c8433d; }
+
+.occ-note {
+    grid-column: 1 / -1;
+    font-size: 0.8rem;
+    color: var(--atu-text-muted);
+}
+
+/* ---------- Segmented (stacked) bar + legend ---------- */
+
+.seg-bar {
+    display: flex;
+    height: 0.7rem;
+    border-radius: 99px;
+    overflow: hidden;
+    background: rgba(11, 61, 99, 0.08);
+}
+
+.seg-bar span { display: block; }
+.seg-available { background: #1e8a5f; }
+.seg-occupied  { background: #c8433d; }
+.seg-reserved  { background: var(--atu-accent); }
+
+.seg-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    margin-top: 0.9rem;
+    font-size: 0.85rem;
+}
+
+.seg-legend .sw {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 0.2rem;
+    display: inline-block;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+}
+
+.seg-legend .sw-count {
+    font-weight: 600;
+    margin-left: 0.2rem;
+}
+
+/* ---------- Activity timeline ---------- */
+
+.timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.44rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 2px;
+    background: var(--atu-border);
+}
+
+.timeline li {
+    position: relative;
+    padding: 0 0 1.1rem 1.8rem;
+}
+
+.timeline li:last-child { padding-bottom: 0; }
+
+.timeline li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.25rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--atu-surface);
+    border: 2px solid var(--atu-text-muted);
+}
+
+.timeline li.tl-green::before { border-color: #1e8a5f; }
+.timeline li.tl-red::before   { border-color: #c8433d; }
+.timeline li.tl-gold::before  { border-color: var(--atu-accent); }
+.timeline li.tl-blue::before  { border-color: var(--atu-primary); }
+
+.tl-text { display: block; font-size: 0.9rem; }
+.tl-time { color: var(--atu-text-muted); font-size: 0.78rem; }
+
+/* ---------- Status dots ---------- */
+
+.status-dot {
+    display: inline-block;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    margin-right: 0.45rem;
+    vertical-align: middle;
+    background: var(--atu-text-muted);
+}
+
+.status-dot.is-on   { background: #1e8a5f; box-shadow: 0 0 0 3px rgba(30, 138, 95, 0.18); }
+.status-dot.is-off  { background: #c8433d; box-shadow: 0 0 0 3px rgba(200, 67, 61, 0.18); }
+.status-dot.is-idle { background: var(--atu-accent); box-shadow: 0 0 0 3px rgba(242, 169, 0, 0.22); }
+
+/* ---------- Slot chips ---------- */
+
+.slot-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.slot-chip.is-available { background: rgba(30, 138, 95, 0.12); color: #146c49; border-color: rgba(30, 138, 95, 0.28); }
+.slot-chip.is-occupied  { background: rgba(200, 67, 61, 0.12); color: #9e2f2a; border-color: rgba(200, 67, 61, 0.28); }
+.slot-chip.is-reserved  { background: rgba(242, 169, 0, 0.16); color: #8a6100; border-color: rgba(242, 169, 0, 0.38); }
+
+/* ---------- Quick action links ---------- */
+
+.quick-action {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius-sm);
+    background: var(--atu-surface);
+    color: var(--atu-text);
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.quick-action:hover {
+    border-color: var(--atu-primary-light);
+    background: rgba(11, 61, 99, 0.03);
+    transform: translateX(3px);
+    color: var(--atu-text);
+}
+
+.quick-action .qa-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.6rem;
+    background: rgba(11, 61, 99, 0.08);
+    color: var(--atu-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.quick-action .qa-title { font-weight: 500; display: block; }
+.quick-action .qa-sub { font-size: 0.78rem; color: var(--atu-text-muted); }
+.quick-action .qa-arrow { margin-left: auto; color: var(--atu-text-muted); }
+
+/* ---------- Filter bar (management screens) ---------- */
+
+.filter-bar {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-bar .form-control,
+.filter-bar .form-select {
+    min-width: 10rem;
+}
+
+/* ---------- Compact inline empty state (inside panels) ---------- */
+
+.panel-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--atu-text-muted);
+}
+
+.panel-empty i {
+    font-size: 1.75rem;
+    display: block;
+    margin-bottom: 0.6rem;
+    opacity: 0.65;
+}
+
+.panel-empty p { margin: 0; font-size: 0.9rem; }
+
+/* ============================================================
+   Navbar refinement
+   Links never wrap (the bar ran to two lines once permits and
+   gate tools were added), the active section is obvious, and
+   dropdowns carry a subtitle line for scanability.
+   ============================================================ */
+
+.navbar .navbar-nav .nav-link {
+    white-space: nowrap;
+    padding-inline: 0.85rem;
+    border-radius: var(--atu-radius-sm);
+    color: rgba(255, 255, 255, 0.82);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.navbar .navbar-nav .nav-link:hover,
+.navbar .navbar-nav .nav-link:focus {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.navbar .navbar-nav .nav-link.active,
+.navbar .navbar-nav .show > .nav-link {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+}
+
+/* Accent underline marks the current section without shouting. */
+.navbar .navbar-nav .nav-link.active {
+    position: relative;
+}
+
+.navbar .navbar-nav .nav-link.active::after {
+    content: '';
+    position: absolute;
+    left: 0.85rem;
+    right: 0.85rem;
+    bottom: 0.15rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--atu-accent);
+}
+
+.navbar .navbar-nav .nav-link i {
+    opacity: 0.9;
+}
+
+/* ---------- Bell + unread badge ---------- */
+
+.navbar .nav-link.nav-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.05rem;
+}
+
+.navbar .nav-badge {
+    position: absolute;
+    top: 0.1rem;
+    left: 1.35rem;
+    min-width: 1.05rem;
+    height: 1.05rem;
+    padding: 0 0.25rem;
+    border-radius: 99px;
+    background: var(--atu-accent);
+    color: #241a00;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.05rem;
+    text-align: center;
+    box-shadow: 0 0 0 2px var(--atu-primary);
+}
+
+@media (max-width: 991.98px) {
+    /* Stacked mobile menu: the badge sits inline, not floating. */
+    .navbar .nav-badge {
+        position: static;
+        box-shadow: none;
+        margin-left: 0.5rem;
+    }
+}
+
+/* ---------- User chip ---------- */
+
+.navbar .nav-link.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.navbar .nav-user-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.navbar .nav-user-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.navbar .nav-user-role {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--atu-accent);
+}
+
+/* ---------- Dropdown menus ---------- */
+
+.navbar .dropdown-menu {
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius);
+    box-shadow: var(--atu-shadow-lg);
+    padding: 0.4rem;
+    margin-top: 0.4rem;
+    min-width: 15rem;
+}
+
+.navbar .dropdown-item {
+    border-radius: var(--atu-radius-sm);
+    padding: 0.55rem 0.7rem;
+    display: grid;
+    grid-template-columns: 1.4rem 1fr;
+    align-items: center;
+    column-gap: 0.55rem;
+    white-space: normal;
+}
+
+.navbar .dropdown-item i {
+    color: var(--atu-primary);
+    font-size: 1rem;
+    grid-row: span 2;
+}
+
+.navbar .dropdown-item .dd-sub {
+    grid-column: 2;
+    font-size: 0.75rem;
+    color: var(--atu-text-muted);
+}
+
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item:focus {
+    background: rgba(11, 61, 99, 0.07);
+    color: var(--atu-primary-dark);
+}
+
+.navbar .dropdown-item:hover i {
+    color: var(--atu-primary-dark);
+}
+
+.navbar .dropdown-divider {
+    margin: 0.35rem 0.2rem;
+    border-color: var(--atu-border);
+}
+
+/* Logout is a form button inside the menu — match the anchors exactly. */
+.navbar .dropdown-item[type="submit"] {
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: none;
+}
+
+@media (max-width: 991.98px) {
+    /* Collapsed menu: give the panel breathing room and drop the dark
+       translucent hover states that only read well on the blue bar. */
+    .navbar-collapse {
+        padding: 0.75rem 0 0.25rem;
+    }
+
+    .navbar .dropdown-menu {
+        box-shadow: none;
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.15);
+        margin: 0.25rem 0 0.5rem 0.75rem;
+    }
+
+    .navbar .dropdown-item {
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .navbar .dropdown-item i {
+        color: var(--atu-accent);
+    }
+
+    .navbar .dropdown-item .dd-sub {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .navbar .dropdown-item:hover,
+    .navbar .dropdown-item:focus {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+    }
+
+    .navbar .nav-user-text {
+        flex-direction: row;
+        gap: 0.5rem;
+        align-items: center;
+    }
+}
+
+/* ============================================================
+   Landing page sections
+   ============================================================ */
+
+.section {
+    padding-block: 3.5rem;
+}
+
+.section-tint {
+    background: linear-gradient(180deg, rgba(11, 61, 99, 0.035), rgba(11, 61, 99, 0));
+    border-block: 1px solid var(--atu-border);
+}
+
+.section-head {
+    max-width: 44rem;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+}
+
+.section-eyebrow {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--atu-primary);
+    background: rgba(11, 61, 99, 0.08);
+    border-radius: 99px;
+    padding: 0.35rem 0.85rem;
+    margin-bottom: 0.9rem;
+}
+
+.section-head h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.85rem;
+    margin-bottom: 0.75rem;
+}
+
+.section-head p {
+    color: var(--atu-text-muted);
+    font-size: 1.02rem;
+    margin-bottom: 0;
+}
+
+/* ---------- Numbered steps ---------- */
+
+.step {
+    text-align: center;
+    padding: 0 0.5rem;
+}
+
+.step-num {
+    width: 3rem;
+    height: 3rem;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: var(--atu-surface);
+    border: 2px solid var(--atu-primary);
+    color: var(--atu-primary);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.step h5 {
+    font-size: 1.02rem;
+    font-weight: 600;
+    margin-bottom: 0.45rem;
+}
+
+.step p {
+    color: var(--atu-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+/* Connector line behind the row of steps, desktop only. */
+.step-row {
+    position: relative;
+}
+
+@media (min-width: 768px) {
+    .step-row::before {
+        content: '';
+        position: absolute;
+        top: 1.5rem;
+        left: 12%;
+        right: 12%;
+        height: 2px;
+        background: var(--atu-border);
+    }
+}
+
+/* ---------- Role cards ---------- */
+
+.role-card {
+    background: var(--atu-surface);
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius);
+    box-shadow: var(--atu-shadow-sm);
+    padding: 1.6rem;
+    height: 100%;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border-top: 3px solid var(--role-color, var(--atu-primary));
+}
+
+.role-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--atu-shadow);
+}
+
+.role-card .role-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--atu-radius-sm);
+    background: var(--role-soft, rgba(11, 61, 99, 0.09));
+    color: var(--role-color, var(--atu-primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+.role-card h5 {
+    font-size: 1.08rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.role-card .role-who {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--atu-text-muted);
+    margin-bottom: 0.9rem;
+}
+
+.role-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.role-card li {
+    position: relative;
+    padding-left: 1.4rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--atu-text);
+}
+
+.role-card li:last-child { margin-bottom: 0; }
+
+.role-card li::before {
+    content: '\F26E';                 /* bi-check-circle-fill */
+    font-family: 'bootstrap-icons';
+    position: absolute;
+    left: 0;
+    top: 0.05rem;
+    font-size: 0.85rem;
+    color: var(--role-color, var(--atu-primary));
+}
+
+.role-driver     { --role-color: var(--atu-primary); --role-soft: rgba(11, 61, 99, 0.09); }
+.role-security   { --role-color: #1e8a5f;            --role-soft: rgba(30, 138, 95, 0.12); }
+.role-office     { --role-color: var(--atu-accent);  --role-soft: rgba(242, 169, 0, 0.16); }
+
+/* ---------- FAQ ---------- */
+
+.faq .accordion-item {
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius);
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    background: var(--atu-surface);
+}
+
+.faq .accordion-button {
+    font-weight: 500;
+    padding: 1rem 1.15rem;
+}
+
+.faq .accordion-button:not(.collapsed) {
+    background: rgba(11, 61, 99, 0.05);
+    color: var(--atu-primary-dark);
+    box-shadow: none;
+}
+
+.faq .accordion-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(11, 61, 99, 0.14);
+}
+
+.faq .accordion-body {
+    color: var(--atu-text-muted);
+    padding-top: 0;
+}
+
+/* ---------- Closing CTA ---------- */
+
+.cta-band {
+    background: linear-gradient(135deg, var(--atu-primary) 0%, var(--atu-primary-dark) 100%);
+    color: #fff;
+    border-radius: var(--atu-radius-lg);
+    box-shadow: var(--atu-shadow);
+    padding: 2.75rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-band::before {
+    content: '';
+    position: absolute;
+    left: -3rem;
+    top: -4rem;
+    width: 13rem;
+    height: 13rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.cta-band > * { position: relative; z-index: 1; }
+
+.cta-band h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.7rem;
+    margin-bottom: 0.6rem;
+}
+
+.cta-band p {
+    color: rgba(255, 255, 255, 0.78);
+    max-width: 34rem;
+    margin: 0 auto 1.6rem;
+}
+
+/* ============================================================
+   Record detail components (permit / booking detail screens)
+   ============================================================ */
+
+/* ---------- Definition grid ----------
+   Replaces a two-column table, which stretched a short label away from
+   its value across the full panel width. The 1px grid gap over a tinted
+   background draws every hairline with no last-row edge cases. */
+
+.def-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--atu-border);
+}
+
+.def-grid > div {
+    background: var(--atu-surface);
+    padding: 0.9rem 1.25rem;
+}
+
+.def-grid > div.def-wide {
+    grid-column: 1 / -1;
+}
+
+.def-key {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--atu-text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.def-val {
+    font-weight: 500;
+}
+
+.def-val .sub {
+    display: block;
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--atu-text-muted);
+}
+
+@media (max-width: 575.98px) {
+    .def-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- Vertical stepper ---------- */
+
+.stepper {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.stepper li {
+    position: relative;
+    padding: 0 0 1.4rem 2.4rem;
+    min-height: 2rem;
+}
+
+.stepper li:last-child {
+    padding-bottom: 0;
+}
+
+.stepper li::before {
+    content: '';
+    position: absolute;
+    left: 0.8rem;
+    top: 1.85rem;
+    bottom: -0.15rem;
+    width: 2px;
+    background: var(--atu-border);
+}
+
+.stepper li:last-child::before {
+    display: none;
+}
+
+.stepper li.is-done::before {
+    background: rgba(30, 138, 95, 0.4);
+}
+
+.stepper .st-dot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 50%;
+    border: 2px solid var(--atu-border);
+    background: var(--atu-surface);
+    color: var(--atu-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+}
+
+.stepper li.is-done .st-dot {
+    border-color: #1e8a5f;
+    background: #1e8a5f;
+    color: #fff;
+}
+
+.stepper li.is-current .st-dot {
+    border-color: var(--atu-accent);
+    background: var(--atu-accent);
+    color: #241a00;
+}
+
+.stepper li.is-failed .st-dot {
+    border-color: #c8433d;
+    background: #c8433d;
+    color: #fff;
+}
+
+.stepper li.is-upcoming .st-dot {
+    border-style: dashed;
+}
+
+.stepper li.is-upcoming .st-label {
+    color: var(--atu-text-muted);
+}
+
+.st-label {
+    font-weight: 500;
+    font-size: 0.92rem;
+    line-height: 1.35;
+}
+
+.st-when {
+    font-size: 0.78rem;
+    color: var(--atu-text-muted);
+}
+
+/* ---------- Person card ---------- */
+
+.person-card {
+    display: flex;
+    gap: 0.9rem;
+    align-items: center;
+}
+
+.person-avatar {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--atu-primary);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.person-name {
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.person-contact {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    display: grid;
+    gap: 0.55rem;
+}
+
+.person-contact li {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+    font-size: 0.88rem;
+}
+
+.person-contact i {
+    color: var(--atu-primary);
+    width: 1rem;
+    flex-shrink: 0;
+}
+
+.person-contact .is-blank {
+    color: var(--atu-text-muted);
+}
+
+/* ---------- Fee box ---------- */
+
+.fee-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius-sm);
+    background: rgba(11, 61, 99, 0.03);
+}
+
+.fee-box.is-paid {
+    border-color: rgba(30, 138, 95, 0.35);
+    background: rgba(30, 138, 95, 0.06);
+}
+
+.fee-box.is-unpaid {
+    border-color: rgba(242, 169, 0, 0.4);
+    background: rgba(242, 169, 0, 0.07);
+}
+
+.fee-amount {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.55rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.fee-amount small {
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: var(--atu-text-muted);
+    display: block;
+    margin-top: 0.3rem;
+}
+
+/* ---------- Credential pass (issued permits / bookings) ---------- */
+
+.credential {
+    background: linear-gradient(135deg, var(--atu-primary) 0%, var(--atu-primary-dark) 100%);
+    color: #fff;
+    border-radius: var(--atu-radius);
+    padding: 1.6rem 1.25rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Notches on either side sell the "tear-off pass" read. */
+.credential::before,
+.credential::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--atu-surface);
+    transform: translateY(-50%);
+}
+
+.credential::before { left: -0.55rem; }
+.credential::after { right: -0.55rem; }
+
+.cred-eyebrow {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+}
+
+.cred-number {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+}
+
+.cred-rule {
+    border-top: 1px dashed rgba(255, 255, 255, 0.3);
+    margin: 1rem -1.25rem;
+}
+
+.cred-plate {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    border-radius: 0.4rem;
+    background: #fff;
+    color: var(--atu-primary-dark);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.cred-meta {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.75);
+    margin-top: 0.7rem;
+}
+
+/* ---------- Attachment row ---------- */
+
+.attach {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--atu-border);
+    border-radius: var(--atu-radius-sm);
+    background: var(--atu-surface);
+    color: var(--atu-text);
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.attach:hover {
+    border-color: var(--atu-primary-light);
+    background: rgba(11, 61, 99, 0.03);
+    color: var(--atu-text);
+}
+
+.attach .at-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    background: rgba(11, 61, 99, 0.08);
+    color: var(--atu-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.attach .at-name { font-weight: 500; display: block; }
+.attach .at-sub { font-size: 0.78rem; color: var(--atu-text-muted); }
+.attach .at-arrow { margin-left: auto; color: var(--atu-text-muted); }
+
+/* ==========================================================================
+   PWA — installed / standalone mode
+   ==========================================================================
+   Only applies once the app is launched from the home screen. In a normal
+   browser tab none of this matches, so desktop and mobile web are untouched.
+*/
+
+/* Installed apps paint edge to edge (viewport-fit=cover in base.html), which
+   would otherwise slide the sticky navbar under the notch and the footer
+   under the home indicator. */
+@media (display-mode: standalone) {
+    .navbar.sticky-top {
+        padding-top: env(safe-area-inset-top);
+    }
+
+    footer {
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    }
+
+    main .container {
+        padding-left: max(var(--bs-gutter-x, 0.75rem), env(safe-area-inset-left));
+        padding-right: max(var(--bs-gutter-x, 0.75rem), env(safe-area-inset-right));
+    }
+
+    /* There is no browser chrome to pull down on, so text selection on a long
+       press mostly produces accidental selections rather than useful ones.
+       Inputs and genuine content keep it (see below). */
+    body {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        overscroll-behavior-y: contain;
+    }
+
+    input, textarea, select, p, td, th, .sim-key, code, pre {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+}
+
+/* ---------- Install banner ---------- */
+
+.pwa-install-bar {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    z-index: 1040;   /* above content, below Bootstrap modals (1055) */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: var(--atu-radius);
+    background: var(--atu-primary);
+    color: #fff;
+    box-shadow: 0 0.75rem 2rem rgba(7, 40, 68, 0.35);
+    animation: pwa-install-in 0.25s ease-out;
+}
+
+.pwa-install-bar[hidden] { display: none; }
+
+@keyframes pwa-install-in {
+    from { opacity: 0; transform: translateY(0.75rem); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pwa-install-bar { animation: none; }
+}
+
+.pwa-install-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.6rem;
+    flex-shrink: 0;
+}
+
+.pwa-install-copy {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+    min-width: 0;
+}
+
+.pwa-install-copy strong { font-size: 0.92rem; }
+
+.pwa-install-copy span {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.pwa-install-bar .btn-accent { flex-shrink: 0; }
+
+.pwa-install-bar .btn-close { flex-shrink: 0; opacity: 0.6; }
+
+.pwa-install-bar .btn-close:hover { opacity: 1; }
+
+/* On the narrowest phones the subtitle is what has to give, not the button. */
+@media (max-width: 400px) {
+    .pwa-install-copy span { display: none; }
+}
+
+/* Centred and content-width on desktop, where a full-bleed bar looks broken. */
+@media (min-width: 576px) {
+    .pwa-install-bar {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        max-width: 30rem;
+        width: calc(100% - 2rem);
+    }
+
+    @keyframes pwa-install-in {
+        from { opacity: 0; transform: translate(-50%, 0.75rem); }
+        to   { opacity: 1; transform: translate(-50%, 0); }
+    }
 }

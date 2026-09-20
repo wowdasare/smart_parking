@@ -1,0 +1,91 @@
+{% load static %}
+{% comment %}
+  Offline fallback, served by the service worker when a navigation fails.
+
+  Deliberately does NOT extend base.html: base pulls Bootstrap, Bootstrap
+  Icons and Google Fonts off CDNs, and the one moment this page is shown is
+  the one moment those are unreachable. Everything here is inline or
+  precached, so it renders correctly with no network at all.
+{% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Offline — ATU Smart Parking</title>
+    <meta name="theme-color" content="#0b3d63">
+    <link rel="icon" type="image/png" href="{% static 'img/atu-badge.png' %}">
+    <style>
+        :root { --navy: #0b3d63; --gold: #f2a900; }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            padding: 2rem 1.5rem calc(2rem + env(safe-area-inset-bottom));
+            text-align: center;
+            background: var(--navy);
+            color: #fff;
+            /* System stack — the webfont is a network request we can't make. */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+        }
+
+        img { width: 96px; height: auto; }
+
+        h1 { margin: 0; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
+
+        p {
+            margin: 0;
+            /* min() so the measure can't overflow a 320px-wide phone, where
+               32ch plus the body padding would be wider than the screen. */
+            max-width: min(32ch, 100%);
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        button {
+            margin-top: 0.5rem;
+            padding: 0.85rem 2rem;
+            min-height: 3rem;
+            border: 0;
+            border-radius: 0.75rem;
+            background: var(--gold);
+            color: var(--navy);
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:active { transform: translateY(1px); }
+
+        .hint {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.55);
+        }
+    </style>
+</head>
+<body>
+    <img src="{% static 'img/atu-badge.png' %}" alt="Accra Technical University crest">
+    <h1>You're offline</h1>
+    <p>
+        ATU Smart Parking needs a connection to show live slot availability —
+        we don't show stale spaces, because a space that looks free but isn't
+        is worse than no answer.
+    </p>
+    <button type="button" onclick="location.reload()">Try again</button>
+    <p class="hint">This page will reload itself once you're back online.</p>
+
+    <script>
+        // Auto-recover the moment connectivity returns, so the user doesn't
+        // have to notice the signal came back and tap anything.
+        window.addEventListener('online', () => location.reload());
+    </script>
+</body>
+</html>

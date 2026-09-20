@@ -1,0 +1,50 @@
+{# Expects: devices (from _device_rows), devices_offline #}
+<div class="panel">
+    <div class="panel-head">
+        <h2 class="panel-title"><i class="bi bi-cpu"></i> Sensor health</h2>
+        {% if devices_offline %}
+            <span class="badge text-bg-danger">{{ devices_offline }} need attention</span>
+        {% elif devices %}
+            <span class="badge text-bg-success">All reporting</span>
+        {% endif %}
+    </div>
+    <div class="panel-body is-flush">
+        {% if devices %}
+            <div class="table-responsive">
+                <table class="table-clean">
+                    <thead>
+                    <tr>
+                        <th>Device</th>
+                        <th>Attached to</th>
+                        <th>Status</th>
+                        <th>Last seen</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in devices %}
+                        <tr>
+                            <td class="cell-strong">{{ row.device.device_id }}</td>
+                            <td class="cell-muted">
+                                {% if row.device.slot %}{{ row.device.slot }}
+                                {% elif row.device.zone %}Zone {{ row.device.zone.code }}
+                                {% else %}&mdash;{% endif %}
+                                <div class="small">{{ row.device.get_device_type_display }}</div>
+                            </td>
+                            <td><span class="status-dot {{ row.state }}"></span>{{ row.label }}</td>
+                            <td class="cell-muted">
+                                {% if row.device.last_seen_at %}{{ row.device.last_seen_at|date:"j M, H:i" }}
+                                {% else %}Never{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="panel-empty">
+                <i class="bi bi-cpu"></i>
+                <p>No sensor devices registered yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>

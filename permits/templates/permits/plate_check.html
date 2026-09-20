@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Plate Check — ATU Smart Parking{% endblock %}
+
+{% block content %}
+    <div class="dash-head">
+        <div class="dash-head-text">
+            <h1><i class="bi bi-upc-scan me-2"></i>Plate check</h1>
+            <p>Is this vehicle covered by a valid parking permit right now?</p>
+        </div>
+        <div class="dash-head-actions">
+            <a class="btn btn-ghost btn-sm" href="{% url 'reservations:gate_verify' %}">
+                <i class="bi bi-qr-code-scan me-1"></i>Booking verification
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-5">
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title"><i class="bi bi-search"></i> Look up a plate</h2>
+                </div>
+                <div class="panel-body">
+                    <form method="get">
+                        <div class="mb-3">
+                            <label for="{{ form.plate.id_for_label }}" class="form-label">{{ form.plate.label }}</label>
+                            {{ form.plate }}
+                            {% for error in form.plate.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Case and spacing are ignored.</div>
+                        </div>
+                        <button class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Check</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            {% if searched and permit %}
+                <div class="panel h-100 border-success">
+                    <div class="panel-head">
+                        <h2 class="panel-title text-success"><i class="bi bi-patch-check-fill"></i> Permit valid</h2>
+                        <span class="badge text-bg-success">Allow entry</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="kpi-label">Plate</div>
+                                <div class="fw-semibold fs-4">{{ permit.vehicle.registration_number }}</div>
+                                <div class="text-muted small">{{ permit.vehicle.make }} {{ permit.vehicle.model }}</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="kpi-label">Permit number</div>
+                                <div class="fw-semibold fs-5"><code>{{ permit.permit_number }}</code></div>
+                                <div class="text-muted small">{{ permit.get_permit_type_display }}</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="kpi-label">Holder</div>
+                                <div>{{ permit.holder.get_full_name|default:permit.holder.username }}</div>
+                                <div class="text-muted small">{{ permit.holder.phone_number|default:permit.holder.email }}</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="kpi-label">Cover</div>
+                                <div>{{ permit.zone_label }}</div>
+                                <div class="text-muted small">
+                                    Until {{ permit.valid_until|date:"j M Y" }}
+                                    ({{ permit.days_remaining }} day{{ permit.days_remaining|pluralize }} left)
+                                </div>
+                            </div>
+                        </div>
+                        {% if not permit.is_paid %}
+                            <div class="alert alert-warning py-2 small mt-3 mb-0">
+                                <i class="bi bi-cash-coin me-1"></i>
+                                Fee of GHS {{ permit.fee_amount }} is still unpaid — remind the driver
+                                to settle it at the parking office.
+                            </div>
+                        {% endif %}
+                        <a class="btn btn-outline-primary btn-sm mt-3" href="{% url 'permits:detail' permit.pk %}">
+                            View full permit
+                        </a>
+                    </div>
+                </div>
+            {% elif searched %}
+                <div class="panel h-100 border-danger">
+                    <div class="panel-head">
+                        <h2 class="panel-title text-danger"><i class="bi bi-patch-exclamation-fill"></i> No valid permit</h2>
+                        <span class="badge text-bg-danger">Refer to office</span>
+                    </div>
+                    <div class="panel-body">
+                        <p class="mb-3">
+                            <strong>{{ searched }}</strong> has no active permit covering today.
+                        </p>
+                        {% if other_permits %}
+                            <p class="text-muted small mb-2">On file for this plate:</p>
+                            <table class="table-clean">
+                                <tbody>
+                                {% for p in other_permits %}
+                                    <tr>
+                                        <td>
+                                            <span class="badge text-bg-{{ p.status_tone }}">{{ p.get_status_display }}</span>
+                                        </td>
+                                        <td class="cell-muted">
+                                            {{ p.valid_from|date:"j M Y" }} &rarr; {{ p.valid_until|date:"j M Y" }}
+                                        </td>
+                                        <td class="text-end">
+                                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'permits:detail' p.pk %}">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p class="text-muted small mb-0">
+                                No permit records exist for this plate at all — the driver has never applied.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="panel h-100">
+                    <div class="panel-body d-flex align-items-center justify-content-center">
+                        <div class="panel-empty">
+                            <i class="bi bi-upc-scan"></i>
+                            <p>Enter a plate to check its permit status.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h2 class="panel-title"><i class="bi bi-hourglass-split"></i> Permits expiring within 14 days</h2>
+            <span class="small text-muted">{{ expiring_soon|length }} permit{{ expiring_soon|length|pluralize }}</span>
+        </div>
+        <div class="panel-body is-flush">
+            {% if expiring_soon %}
+                <div class="table-responsive">
+                    <table class="table-clean">
+                        <thead>
+                        <tr><th>Permit</th><th>Holder</th><th>Plate</th><th>Expires</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        {% for p in expiring_soon %}
+                            <tr>
+                                <td><code>{{ p.permit_number }}</code></td>
+                                <td>{{ p.holder.get_full_name|default:p.holder.username }}</td>
+                                <td class="cell-strong">{{ p.vehicle.registration_number }}</td>
+                                <td class="cell-muted">
+                                    {{ p.valid_until|date:"j M Y" }} ({{ p.days_remaining }} day{{ p.days_remaining|pluralize }})
+                                </td>
+                                <td class="text-end">
+                                    <a class="btn btn-outline-primary btn-sm" href="{% url 'permits:detail' p.pk %}">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="panel-empty">
+                    <i class="bi bi-check2-circle"></i>
+                    <p>No permits are expiring in the next two weeks.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

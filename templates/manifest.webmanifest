@@ -1,0 +1,68 @@
+{% load static %}{% comment %}
+  Web app manifest. Rendered as a template (not a plain static file) so the
+  icon paths go through {% static %} and keep working if STATIC_URL changes or
+  a hashed-filename storage backend is turned on for production.
+
+  Served at /manifest.webmanifest by atuparking/urls.py.
+{% endcomment %}{
+  "name": "ATU Smart Parking",
+  "short_name": "ATU Parking",
+  "description": "Find free parking on campus, book a slot, and manage your permit at Accra Technical University.",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b3d63",
+  "theme_color": "#0b3d63",
+  "categories": ["travel", "utilities", "education"],
+  "icons": [
+    {
+      "src": "{% static 'img/icon-192.png' %}",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "{% static 'img/icon-512.png' %}",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "{% static 'img/icon-maskable-512.png' %}",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live availability",
+      "short_name": "Availability",
+      "description": "Free spaces by zone, right now",
+      "url": "{% url 'parking:zone_list' %}",
+      "icons": [{ "src": "{% static 'img/icon-192.png' %}", "sizes": "192x192" }]
+    },
+    {
+      "name": "Book a slot",
+      "short_name": "Book",
+      "description": "Reserve a parking slot",
+      "url": "{% url 'reservations:create' %}",
+      "icons": [{ "src": "{% static 'img/icon-192.png' %}", "sizes": "192x192" }]
+    },
+    {
+      "name": "My reservations",
+      "short_name": "Bookings",
+      "description": "Your upcoming and past bookings",
+      "url": "{% url 'reservations:list' %}",
+      "icons": [{ "src": "{% static 'img/icon-192.png' %}", "sizes": "192x192" }]
+    },
+    {
+      "name": "Alerts",
+      "short_name": "Alerts",
+      "description": "Booking and permit notifications",
+      "url": "{% url 'notifications:list' %}",
+      "icons": [{ "src": "{% static 'img/icon-192.png' %}", "sizes": "192x192" }]
+    }
+  ]
+}
